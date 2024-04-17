@@ -11,11 +11,40 @@ import (
 
 type Todo struct {
 	ID        int `gorm:"primaryKey"`
+	UserID		int
+	User      User
 	Title     string
 	DoneFlag  bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
+}
+
+type User struct {
+	ID        int `gorm:"primaryKey"`
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+}
+
+type Category struct {
+	ID        int `gorm:"primaryKey"`
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+}
+
+type TodoCategory struct {
+	ID         int `gorm:"primaryKey"`
+	TodoID     int
+	CategoryID int
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  *time.Time
 }
 
 type Todos []Todo
@@ -41,7 +70,7 @@ func db() (Todo, error) {
 	}
 
 	var todo Todo
-	if result := db.First(&todo); result.Error != nil {
+	if result := db.Preload("Users").First(&todo); result.Error != nil {
 		fmt.Println(result.Error)
 		return Todo{}, err
 	}
