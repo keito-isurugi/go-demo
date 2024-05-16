@@ -5,5 +5,3 @@
 - gRPC
 - net/http
 - swagger
-  - 
-- HOGE

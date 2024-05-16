@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
+	// "log"
+	// "net/http"
 	"time"
+	"github.com/keito-isurugi/go-demo/goodbaddev"
 )
 
 type Todo struct {
@@ -50,15 +51,30 @@ type TodoCategory struct {
 type Todos []Todo
 
 func main() {
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		todo, err := db()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		fmt.Fprintf(w, "Todo: %+v", todo)
-	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+	// 	todo, err := db()
+	// 	if err != nil {
+	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// 	fmt.Fprintf(w, "Todo: %+v", todo)
+	// })
+	// log.Fatal(http.ListenAndServe(":8080", nil))
+	magicGouka := &goodbaddev.MagicMnager{}
+	magicGouka.NewMagic(goodbaddev.HellFire)
+	magicGouka.GetName()
+	magicGouka.CostMagicPoint()
+	magicGouka.AttackPower()
+	magicGouka.CostTechnicalPoint()
+
+	fmt.Println("=================")
+
+	magicShiden := &goodbaddev.MagicMnager{}
+	magicShiden.NewMagic(goodbaddev.Shiden)
+	magicShiden.GetName()
+	magicShiden.CostMagicPoint()
+	magicShiden.AttackPower()
+	magicShiden.CostTechnicalPoint()
 }
 
 func db() (Todo, error) {
