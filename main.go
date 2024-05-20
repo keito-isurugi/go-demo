@@ -60,21 +60,35 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
+
+	// switchを一箇所にした実装
 	magicGouka := &goodbaddev.MagicMnager{}
-	magicGouka.NewMagic(goodbaddev.HellFire)
+	magicGouka.NewMagic(goodbaddev.MagicHellFire)
 	magicGouka.GetName()
 	magicGouka.CostMagicPoint()
 	magicGouka.AttackPower()
 	magicGouka.CostTechnicalPoint()
-
 	fmt.Println("=================")
-
 	magicShiden := &goodbaddev.MagicMnager{}
-	magicShiden.NewMagic(goodbaddev.Shiden)
+	magicShiden.NewMagic(goodbaddev.MagicShiden)
 	magicShiden.GetName()
 	magicShiden.CostMagicPoint()
 	magicShiden.AttackPower()
 	magicShiden.CostTechnicalPoint()
+	fmt.Println("=================")
+
+	// strategyパターンを使用した実装
+	fire := &goodbaddev.Fire{}
+	shiden := &goodbaddev.Shiden{}
+	
+	manager := goodbaddev.NewMagicManager(fire)
+	fmt.Println("ファイヤの情報：")
+	manager.Execute()
+	fmt.Println()
+	manager.SetStrategy(shiden)
+	fmt.Println("紫電の情報：")
+	manager.Execute()
+	
 }
 
 func db() (Todo, error) {
