@@ -88,6 +88,11 @@ func main() {
 	manager.SetStrategy(shiden)
 	fmt.Println("紫電の情報：")
 	manager.Execute()
+	fmt.Println("=================")
+
+	// ポリシーパターン
+	goodbaddev.Policy()
+
 	
 }
 
