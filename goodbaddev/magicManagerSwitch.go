@@ -58,3 +58,20 @@ func (mm *MagicMnager) AttackPower() {
 func (mm *MagicMnager) CostTechnicalPoint() {
     fmt.Println("消費TP: ", mm.MagicTechnicalPoint)
 }
+
+func MgickSwitch() {
+    magicGouka := &MagicMnager{}
+	magicGouka.NewMagic(MagicHellFire)
+	magicGouka.GetName()
+	magicGouka.CostMagicPoint()
+	magicGouka.AttackPower()
+	magicGouka.CostTechnicalPoint()
+	fmt.Println("=================")
+	magicShiden := &MagicMnager{}
+	magicShiden.NewMagic(MagicShiden)
+	magicShiden.GetName()
+	magicShiden.CostMagicPoint()
+	magicShiden.AttackPower()
+	magicShiden.CostTechnicalPoint()
+	fmt.Println("=================")
+}

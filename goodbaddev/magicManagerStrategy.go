@@ -64,3 +64,17 @@ func (hf *HellFire) AttackPower() {
 func (hf *HellFire) CostTechnicalPoint() {
     fmt.Println("消費TP: 100")
 }
+
+func MagicSrategy() {
+    fire := &Fire{}
+	shiden := &Shiden{}
+	
+	manager := NewMagicManager(fire)
+	fmt.Println("ファイヤの情報：")
+	manager.Execute()
+	fmt.Println()
+	manager.SetStrategy(shiden)
+	fmt.Println("紫電の情報：")
+	manager.Execute()
+	fmt.Println("=================")
+}
