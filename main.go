@@ -7,7 +7,6 @@ import (
 	// "log"
 	// "net/http"
 	"time"
-	"github.com/keito-isurugi/go-demo/goodbaddev"
 )
 
 type Todo struct {
@@ -60,7 +59,6 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
-	goodbaddev.FirstCollection()
 	
 }
 
