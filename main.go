@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
 	// "log"
 	// "net/http"
 	"time"
+
+	"github.com/keito-isurugi/go-demo/books/tyozetsu"
 )
 
 type Todo struct {
@@ -59,7 +63,7 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
-	
+	tyozetsu.TddExec()
 }
 
 func db() (Todo, error) {
