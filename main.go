@@ -10,7 +10,7 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/adapter"
+	"github.com/keito-isurugi/go-demo/books/designpattern/templatemethod"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
-	adapter.Exec()
+	templatemethod.Exec()
 }
 
 func db() (Todo, error) {
