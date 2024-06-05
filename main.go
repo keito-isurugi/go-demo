@@ -10,7 +10,7 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/tyozetsu"
+	"github.com/keito-isurugi/go-demo/books/designpattern/iterator"
 )
 
 type Todo struct {
@@ -63,7 +63,7 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
-	tyozetsu.TddExec()
+	iterator.Exec()
 }
 
 func db() (Todo, error) {
