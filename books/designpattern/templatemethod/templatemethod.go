@@ -8,11 +8,13 @@ type IDisplay interface {
 	open()
 	print()
 	close()
-	display()
 }
 
 type AbstractDisplay struct {
 	Display IDisplay
+}
+func NewAbstractDisplay(id IDisplay) *AbstractDisplay{
+	return &AbstractDisplay{Display: id} 
 }
 func (d *AbstractDisplay) display() {
 	d.Display.open()
@@ -25,16 +27,16 @@ func (d *AbstractDisplay) display() {
 type CharDisplay struct {
 	number int
 }
-func NewCharDisplay(n int) *CharDisplay{
-	return &CharDisplay{number: n}
+func NewCharDisplay(n int) CharDisplay{
+	return CharDisplay{number: n}
 }
-func (cd *CharDisplay) open() {
+func (cd CharDisplay) open() {
 	fmt.Print("<<")
 }
-func (cd *CharDisplay) print() {
+func (cd CharDisplay) print() {
 	fmt.Print(cd.number)
 }
-func (cd *CharDisplay) close() {
+func (cd CharDisplay) close() {
 	fmt.Println(">>")
 }
 
@@ -43,22 +45,22 @@ type StringDisplay struct {
 	string string
 	width int
 }
-func NewStringDisplay(s string) *StringDisplay{
-	return &StringDisplay{
+func NewStringDisplay(s string) StringDisplay{
+	return StringDisplay{
 		string: s,
 		width: len(s) + 1,
 	}
 }
-func (cd *StringDisplay) open() {
+func (cd StringDisplay) open() {
 	cd.printLine()
 }
-func (cd *StringDisplay) print() {
+func (cd StringDisplay) print() {
 	fmt.Println("|", cd.string , "|")
 }
-func (cd *StringDisplay) close() {
+func (cd StringDisplay) close() {
 	cd.printLine()
 }
-func (cd *StringDisplay) printLine() {
+func (cd StringDisplay) printLine() {
 	fmt.Print("+")
 	for i := 0; i <= cd.width; i++ {
 		fmt.Print("-")
@@ -67,16 +69,11 @@ func (cd *StringDisplay) printLine() {
 }
 
 func Exec() {
-	cd := NewCharDisplay(100)
-	cd.open()
-	cd.print()
-	cd.close()
+	cd := NewCharDisplay(9)
+	d1 := NewAbstractDisplay(cd)
+	d1.display()
 
 	sd := NewStringDisplay("Hello, world")
-	sd.open()
-	sd.print()
-	sd.print()
-	sd.print()
-	sd.print()
-	sd.close()
+	d2 := NewAbstractDisplay(sd)
+	d2.display()
 }
