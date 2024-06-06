@@ -10,11 +10,11 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/singleton"
+	"github.com/keito-isurugi/go-demo/books/designpattern/prototype"
 )
 
 func main() {
-	singleton.Exec()
+	prototype.Exec()
 
 	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	// 	todo, err := db()
