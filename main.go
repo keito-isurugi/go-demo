@@ -10,11 +10,11 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/factorymethod"
+	"github.com/keito-isurugi/go-demo/books/designpattern/singleton"
 )
 
 func main() {
-	factorymethod.Exec()
+	singleton.Exec()
 
 	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	// 	todo, err := db()
