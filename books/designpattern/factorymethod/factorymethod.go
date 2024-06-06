@@ -25,13 +25,14 @@ func (af AbstructFactory) create(owner string) Product{
 
 type IDCard struct {
 	owner string
+	serial int
 }
-func NewIDCard(owner string) *IDCard{
-	fmt.Println(owner, "のカードを作ります。")
-	return &IDCard{owner: owner}
+func NewIDCard(owner string, serial int) *IDCard{
+	fmt.Println(owner, "(No.", serial ,")", "のカードを作ります。")
+	return &IDCard{owner: owner, serial: serial}
 }
 func (idc IDCard) use() {
-	fmt.Println(idc.owner, "のカードを使います。")
+	fmt.Println(idc.owner, "(No.",idc.serial ,")", "のカードを使います。")
 }
 func (idc IDCard) getOwner() string{
 	return idc.owner
@@ -39,17 +40,19 @@ func (idc IDCard) getOwner() string{
 
 type IDCardFactory struct {
 	owners []string
+	serial int
 }
 func NewIDCardFactory() *IDCardFactory{
-	return &IDCardFactory{owners: make([]string, 0)}
+	return &IDCardFactory{owners: make([]string, 0), serial: 100}
 }
-func (idcf IDCardFactory) createProduct(owner string) Product{
-	return NewIDCard(owner)
+func (idcf *IDCardFactory) createProduct(owner string) Product{
+	idcf.serial++
+	return NewIDCard(owner, idcf.serial)
 }
-func (idcf IDCardFactory) registerProduct(product Product) {
+func (idcf *IDCardFactory) registerProduct(product Product) {
 	idcf.owners = append(idcf.owners, product.getOwner())
 }
-func (idcf IDCardFactory) getOwners() []string {
+func (idcf *IDCardFactory) getOwners() []string {
 	return idcf.owners
 }
 
