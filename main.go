@@ -10,10 +10,12 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/templatemethod"
+	"github.com/keito-isurugi/go-demo/books/designpattern/factorymethod"
 )
 
 func main() {
+	factorymethod.Exec()
+
 	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	// 	todo, err := db()
 	// 	if err != nil {
@@ -23,7 +25,6 @@ func main() {
 	// 	fmt.Fprintf(w, "Todo: %+v", todo)
 	// })
 	// log.Fatal(http.ListenAndServe(":8080", nil))
-	templatemethod.Exec()
 }
 
 func db() (Todo, error) {
