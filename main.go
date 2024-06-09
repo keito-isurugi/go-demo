@@ -10,11 +10,11 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/builder"
+	"github.com/keito-isurugi/go-demo/books/designpattern/abstractfactory"
 )
 
 func main() {
-	builder.Exec()
+	abstractfactory.Exec()
 
 	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	// 	todo, err := db()
