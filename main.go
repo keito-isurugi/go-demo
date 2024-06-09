@@ -10,11 +10,11 @@ import (
 	// "net/http"
 	"time"
 
-	"github.com/keito-isurugi/go-demo/books/designpattern/prototype"
+	"github.com/keito-isurugi/go-demo/books/designpattern/builder"
 )
 
 func main() {
-	prototype.Exec()
+	builder.Exec()
 
 	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
 	// 	todo, err := db()
