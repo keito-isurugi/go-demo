@@ -1,2 +1,4 @@
 persist
 .env
+tmp
+.main
