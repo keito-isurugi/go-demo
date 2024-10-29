@@ -3,28 +3,25 @@ package main
 import (
 	"fmt"
 
+	"github.com/keito-isurugi/go-demo/handler"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	// "log"
-	// "net/http"
+	"log"
+	"net/http"
 	"time"
-
-	"github.com/keito-isurugi/go-demo/books/designpattern/abstractfactory"
 )
 
 func main() {
-	abstractfactory.Exec()
-
-	// http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-	// 	todo, err := db()
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	fmt.Fprintf(w, "Todo: %+v", todo)
-	// })
-	// log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello, World!!!")
+    })
+	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Bar!")
+    })
+	http.HandleFunc("/demo/time", handler.TimeDemoHandler)
+	fmt.Println("localhost:8080 server runnig ...")
+    log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func db() (Todo, error) {
