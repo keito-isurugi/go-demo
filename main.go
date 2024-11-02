@@ -20,6 +20,7 @@ func main() {
         fmt.Fprintf(w, "Bar!")
     })
 	http.HandleFunc("/demo/time", handler.TimeDemoHandler)
+	http.HandleFunc("/demo/algorithm", handler.AlgorithmDemoHandler)
 	fmt.Println("localhost:8080 server runnig ...")
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
