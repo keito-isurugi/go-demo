@@ -12,12 +12,15 @@ func LinearSearch(slice []int, t int) (int, error) {
 }
 
 func BubbleAscSort(slice []int) []int {
-	for i := range slice {
-		if slice[i] > slice[i - 1] {
-			tmp := slice[i]
-			slice[i] = slice[i - 1]
-			slice[i - 1] = tmp
-		}
+	n := len(slice)
+	for i := 0; i < n-1; i++ {
+		for j := 0; j < n-1-i; j++ {
+			if slice[j] > slice[j+1] {
+				tmp := slice[j]
+				slice[j] = slice[j+1]
+				slice[j+1] = tmp
+			}
+		} 
 	}
 	return slice
 }
