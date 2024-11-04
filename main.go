@@ -16,11 +16,13 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "Hello, World!!!")
     })
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Bar!")
-    })
+
+	// 時関
 	http.HandleFunc("/demo/time", handler.TimeDemoHandler)
+
+	// アルゴリズム
 	http.HandleFunc("/demo/algorithm", handler.AlgorithmDemoHandler)
+	
 	fmt.Println("localhost:8080 server runnig ...")
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
