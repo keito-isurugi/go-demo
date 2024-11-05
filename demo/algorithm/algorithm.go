@@ -24,3 +24,17 @@ func BubbleAscSort(slice []int) []int {
 	}
 	return slice
 }
+
+func BubbleDescSort(slice []int) []int {
+	n := len(slice)
+	for i := 0; i < n-1; i++ {
+		for j := 0; j < n-1-i; j++ {
+			if slice[j] < slice[j+1] {
+				tmp := slice[j]
+				slice[j] = slice[j+1]
+				slice[j+1] = tmp
+			}
+		} 
+	}
+	return slice
+}
