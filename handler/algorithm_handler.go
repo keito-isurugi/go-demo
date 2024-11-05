@@ -15,6 +15,17 @@ func AlgorithmDemoHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	fmt.Println(lsr)
+	fmt.Println("=========================")
+
+	bass := []int{ 8, 4, 5, 2, 9, 10}
+	bssr := algorithm.BubbleAscSort(bass)
+	fmt.Println(bssr)
+	fmt.Println("=========================")
 	
+	bdss := []int{ 8, 4, 5, 2, 9, 10}
+	bdsr := algorithm.BubbleDescSort(bdss)
+	fmt.Println(bdsr)
+	fmt.Println("=========================")
+
 	w.Write([]byte("demo of algorithm"))
 }
