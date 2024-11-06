@@ -41,6 +41,19 @@ func AlgorithmDemoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("=========================\n"))
 
 
+	// 二分探索(配列内の値の重複なし)
+	bsAry := []int{1, 2, 3, 4, 5, 6}
+	bsTarget := generateRandomInt(1, 5)
+	w.Write([]byte(fmt.Sprintf("Array: %v\n", bsAry)))
+	w.Write([]byte(fmt.Sprintf("Search target: %d\n", bsTarget)))
+
+	bsRes := algorithm.BinarySearch(bsAry, bsTarget)
+	if bsRes != -1 {
+		w.Write([]byte(fmt.Sprintf("二分探索(配列内の値の重複なし)：ターゲット %d はインデックス %d にあります\n", bsTarget, bsRes)))
+	} else {
+		w.Write([]byte("二分探索(配列内の値の重複なし)：該当する値は存在しません。"))
+	}
+	w.Write([]byte("=========================\n"))
 }
 
 func generateRandomArray(min, max int) []int {
