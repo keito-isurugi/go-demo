@@ -2,30 +2,60 @@ package handler
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/keito-isurugi/go-demo/demo/algorithm"
 )
 
 func AlgorithmDemoHandler(w http.ResponseWriter, r *http.Request) {
-	lss := []int{ 1, 2, 3, 4, 5 }
-	lst := 4
+	// 線形探索
+	lss := generateRandomArray(1, 5)
+	lst := generateRandomInt(1, 5)
+	w.Write([]byte(fmt.Sprintf("Array: %v\n", lss)))
+	w.Write([]byte(fmt.Sprintf("Search target: %d\n", lst)))
+
 	lsr, err := algorithm.LinearSearch(lss, lst)
 	if err != nil {
-		fmt.Println(err)
+		w.Write([]byte("線形探索: 該当する値は存在しません。\n"))
+	} else {
+		w.Write([]byte(fmt.Sprintf("線形探索結果: %d\n", lsr)))
 	}
-	fmt.Println(lsr)
-	fmt.Println("=========================")
+	w.Write([]byte("=========================\n"))
 
-	bass := []int{ 8, 4, 5, 2, 9, 10}
+
+	// バブルソート(昇順)
+	bass := generateRandomArray(1, 50)
+	w.Write([]byte(fmt.Sprintf("Array: %v\n", bass)))
 	bssr := algorithm.BubbleAscSort(bass)
-	fmt.Println(bssr)
-	fmt.Println("=========================")
-	
-	bdss := []int{ 8, 4, 5, 2, 9, 10}
-	bdsr := algorithm.BubbleDescSort(bdss)
-	fmt.Println(bdsr)
-	fmt.Println("=========================")
+	w.Write([]byte(fmt.Sprintf("バブルソート(昇順): %d\n", bssr)))	
+	w.Write([]byte("=========================\n"))
 
-	w.Write([]byte("demo of algorithm"))
+
+	// バブルソート(降順)
+	bdss := generateRandomArray(1, 50)
+	w.Write([]byte(fmt.Sprintf("Array: %v\n", bdss)))
+	bdsr := algorithm.BubbleDescSort(bdss)
+	w.Write([]byte(fmt.Sprintf("バブルソート(降順): %d\n", bdsr)))
+	w.Write([]byte("=========================\n"))
+
+
+}
+
+func generateRandomArray(min, max int) []int {
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+
+	randomArray := make([]int, max)
+	for i := 0; i < max; i++ {
+		randomArray[i] = r.Intn(max - min + 1) + min
+	}
+	return randomArray
+}
+
+func generateRandomInt(min, max int) int {
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+	return r.Intn(max - min + 1) + min
 }
