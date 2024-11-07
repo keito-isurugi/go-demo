@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/keito-isurugi/go-demo/books"
 	"github.com/keito-isurugi/go-demo/handler"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,6 +23,9 @@ func main() {
 
 	// アルゴリズム
 	http.HandleFunc("/demo/algorithm", handler.AlgorithmDemoHandler)
+
+	// 書籍
+	http.HandleFunc("/demo/books", books.BooksDemoHandler)
 	
 	fmt.Println("localhost:8080 server runnig ...")
     log.Fatal(http.ListenAndServe(":8080", nil))
