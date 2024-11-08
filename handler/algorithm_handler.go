@@ -16,11 +16,11 @@ func AlgorithmDemoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Array: %v\n", lss)))
 	w.Write([]byte(fmt.Sprintf("Search target: %d\n", lst)))
 
-	lsr, err := algorithm.LinearSearch(lss, lst)
-	if err != nil {
-		w.Write([]byte("線形探索: 該当する値は存在しません。\n"))
+	lsr := algorithm.LinearSearch(lss, lst)
+	if lsr != -1 {
+		w.Write([]byte(fmt.Sprintf("二分探索(配列内の値の重複なし)：ターゲット %d はインデックス %d にあります\n", lst, lsr)))
 	} else {
-		w.Write([]byte(fmt.Sprintf("線形探索結果: %d\n", lsr)))
+		w.Write([]byte("二分探索(配列内の値の重複なし)：該当する値は存在しません。"))
 	}
 	w.Write([]byte("=========================\n"))
 
