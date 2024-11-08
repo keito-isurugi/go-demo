@@ -1,53 +1,51 @@
 package algorithm
 
-import "fmt"
-
-func LinearSearch(slice []int, t int) (int, error) {
-	for _, v := range slice {
-		if v == t {
-			return v, nil
- 		}
+func LinearSearch(array []int, target int) int {
+	for i, v := range array {
+		if v == target {
+			return i
+		}
 	}
-	return 0, fmt.Errorf("該当する値が存在しません")
+	return -1
 }
 
-func BubbleAscSort(slice []int) []int {
-	n := len(slice)
+func BubbleAscSort(array []int) []int {
+	n := len(array)
 	for i := 0; i < n-1; i++ {
 		for j := 0; j < n-1-i; j++ {
-			if slice[j] > slice[j+1] {
-				tmp := slice[j]
-				slice[j] = slice[j+1]
-				slice[j+1] = tmp
+			if array[j] > array[j+1] {
+				tmp := array[j]
+				array[j] = array[j+1]
+				array[j+1] = tmp
 			}
 		} 
 	}
-	return slice
+	return array
 }
 
-func BubbleDescSort(slice []int) []int {
-	n := len(slice)
+func BubbleDescSort(array []int) []int {
+	n := len(array)
 	for i := 0; i < n-1; i++ {
 		for j := 0; j < n-1-i; j++ {
-			if slice[j] < slice[j+1] {
-				tmp := slice[j]
-				slice[j] = slice[j+1]
-				slice[j+1] = tmp
+			if array[j] < array[j+1] {
+				tmp := array[j]
+				array[j] = array[j+1]
+				array[j+1] = tmp
 			}
 		} 
 	}
-	return slice
+	return array
 }
 
-func BinarySearch(arr []int, target int) int {
-	left, right := 0, len(arr) - 1
+func BinarySearch(array []int, target int) int {
+	left, right := 0, len(array) - 1
 
 	for left <= right {
 		mid := left + (right - left) / 2
 		
-		if arr[mid] == target {
+		if array[mid] == target {
 			return mid
-		} else if arr[mid] < target {
+		} else if array[mid] < target {
 			left = mid + 1
 		} else {
 			right = mid - 1
