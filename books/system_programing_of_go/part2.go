@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func Part2() {
@@ -41,46 +46,46 @@ func Part2() {
 }
 
 func Part2_2() {
-	// conn, err := net.Dial("tcp", "example.com:80")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// io.WriteString(conn, "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n")
-	// io.Copy(os.Stdout, conn)
+	conn, err := net.Dial("tcp", "example.com:80")
+	if err != nil {
+		panic(err)
+	}
+	io.WriteString(conn, "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n")
+	io.Copy(os.Stdout, conn)
 
-	// http.HandleFunc("/", handler)
-	// http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
 
-	// file, err := os.Create("multiwriter.txt")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// writer := io.MultiWriter(file, os.Stdout)
-	// io.WriteString(writer, "io.MultiWriter example\n")
+	file, err := os.Create("multiwriter.txt")
+	if err != nil {
+		panic(err)
+	}
+	writer := io.MultiWriter(file, os.Stdout)
+	io.WriteString(writer, "io.MultiWriter example\n")
 
-	// file, err := os.Create("test.txt.zip")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// writer := gzip.NewWriter(file)
-	// writer.Header.Name = "test.txt"
-	// io.WriteString(writer, "gzip.Writer example\n")
-	// writer.Close()
+	file2, err := os.Create("test.txt.zip")
+	if err != nil {
+		panic(err)
+	}
+	writer2 := gzip.NewWriter(file2)
+	writer2.Header.Name = "test.txt"
+	io.WriteString(writer, "gzip.Writer example\n")
+	writer2.Close()
 
-	// buffer := bufio.NewWriter(os.Stdout)
-	// buffer.WriteString("bufio.Writer ")
-	// buffer.Flush()
-	// buffer.WriteString("example\n")
-	// buffer.Flush()
+	buffer := bufio.NewWriter(os.Stdout)
+	buffer.WriteString("bufio.Writer ")
+	buffer.Flush()
+	buffer.WriteString("example\n")
+	buffer.Flush()
 
-	// fmt.Fprintf(os.Stdout, "Write with os.Stdout at %v", time.Now())
+	fmt.Fprintf(os.Stdout, "Write with os.Stdout at %v", time.Now())
 
-	// encoder := json.NewEncoder(os.Stdout)
-	// encoder.SetIndent("", "   ")
-	// encoder.Encode(map[string]string{
-	// 	"example": "encoding/'json",
-	// 	"hello":   "world",
-	// })
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "   ")
+	encoder.Encode(map[string]string{
+		"example": "encoding/'json",
+		"hello":   "world",
+	})
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	if err != nil {
