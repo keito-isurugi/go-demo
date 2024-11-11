@@ -10,28 +10,28 @@ import (
 func Part4() {
 	fmt.Println("start sub()")
 
-	// go sub()
+	go sub()
 
-	// go func() {
-	// 	fmt.Println("sub() is runnnig")
-	// 	time.Sleep(time.Second)
-	// 	fmt.Println("sub() is finished")
-	// }()
+	go func() {
+		fmt.Println("sub() is runnnig")
+		time.Sleep(time.Second)
+		fmt.Println("sub() is finished")
+	}()
 
-	// time.Sleep(2 * time.Second)
+	time.Sleep(2 * time.Second)
 
-	// done := make(chan bool)
-	// go func() {
-	// 	fmt.Println("sub() is finished")
-	// 	done <- true
-	// }()
-	// <-done
-	// fmt.Println("all tasks are finished")
+	done := make(chan bool)
+	go func() {
+		fmt.Println("sub() is finished")
+		done <- true
+	}()
+	<-done
+	fmt.Println("all tasks are finished")
 
-	// pn := primeNumber()
-	// for n := range pn {
-	// 	fmt.Println(n)
-	// }
+	pn := primeNumber()
+	for n := range pn {
+		fmt.Println(n)
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
