@@ -4,7 +4,7 @@ import (
     "testing"
 )
 
-const size = 100000
+const size = 10000000
 
 // ベンチマーク関数: append の場合
 func BenchmarkAppend(b *testing.B) {
@@ -17,7 +17,7 @@ func BenchmarkAppend(b *testing.B) {
     }
 }
 
-// ベンチマーク関数: hoge[i] = foo の場合
+// ベンチマーク関数: slice[i] = int の場合
 func BenchmarkIndexAssignment(b *testing.B) {
     b.ReportAllocs()  // メモリ割り当てをレポートするように設定
 
