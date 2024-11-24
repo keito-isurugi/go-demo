@@ -8,6 +8,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/kr/pty v1.1.8 // indirect
+	github.com/lestrrat/go-server-starter v0.0.0-20180220115249-6ac0b358431b // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
