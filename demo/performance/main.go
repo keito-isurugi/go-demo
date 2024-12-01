@@ -22,12 +22,40 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	// err = FileOutPutTodosWithRefrect1(db, "hoge.txt")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	registerDummyTodos(db)
+}
 
-	err = fileOutPutTodos(db, "file.txt")
+func FileOutPutTodosWithRefrect1(db *gorm.DB, fileName string) error {
+	file, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
-	// registerDummyTodos(db)
+	defer file.Close()
+
+	var todos []Todo
+	result := db.Find(&todos)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	fmt.Println(todos)
+	for _, todo := range todos {
+		fields := []string{
+			fmt.Sprintf("ID: %v", todo.ID),
+			fmt.Sprintf("Title: %v", todo.Title),
+			fmt.Sprintf("Note: %v", todo.Note),
+		}
+		_, err := fmt.Fprintf(file, "{%s},\n", strings.Join(fields, ", "))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func dbConn() (*gorm.DB, error) {
@@ -42,6 +70,7 @@ func dbConn() (*gorm.DB, error) {
 
 type Todo struct {
 	ID        int `gorm:"primaryKey"`
+	UserID 	  int
 	Title     string
 	Note      string
 	DoneFlag  bool
@@ -71,9 +100,10 @@ func registerDummyTodos(db *gorm.DB) {
 		fmt.Errorf("failed to truncate todos table: %v", err)
 	}
 
-	count := 100000
-	for i := 0; i <= count; i++ {
+	count := 10000
+	for i := 0; i < count; i++ {
 		t := Todo{
+			UserID: 1,
 			Title: fmt.Sprintf("ダミーTODO_%v", i+1),
 			Note:  fmt.Sprintf("ダミーで登録したTODO_%vです", i+1),
 		}
