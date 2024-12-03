@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"os"
-	"reflect"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -27,6 +26,9 @@ func fileOutPutTodosBatchedBench(db *gorm.DB, fileName string) error {
 	}
 	defer file.Close()
 
+	writer := bufio.NewWriter(file)
+	defer writer.Flush()
+
 	var todos []Todo
 	result := db.Find(&todos)
 	if result.Error != nil {
@@ -34,16 +36,13 @@ func fileOutPutTodosBatchedBench(db *gorm.DB, fileName string) error {
 	}
 
 	for _, todo := range todos {
-		val := reflect.ValueOf(todo)
-		typ := val.Type()
-
-		var fields []string
-		for i := 0; i < typ.NumField(); i++ {
-			key := typ.Field(i).Name
-			value := fmt.Sprintf("%v", val.Field(i).Interface())
-			fields = append(fields, fmt.Sprintf("%v: %v", key, value))
+		fields := []string{
+			fmt.Sprintf("ID: %v", todo.ID),
+			fmt.Sprintf("Title: %v", todo.Title),
+			fmt.Sprintf("Note: %v", todo.Note),
 		}
-		_, err := fmt.Fprintf(file, "{%s},\n", strings.Join(fields, ", "))
+		line := fmt.Sprintf("{%s},\n", strings.Join(fields, ", "))
+		_, err := writer.WriteString(line)
 		if err != nil {
 			return err
 		}
@@ -68,6 +67,9 @@ func fileOutPutTodosWithStreamBench(db *gorm.DB, fileName string) error {
 	}
 	defer file.Close()
 
+	writer := bufio.NewWriter(file)
+	defer writer.Flush()
+
 	rows, err := db.Table("todos").Rows()
 	if err != nil {
 		return err
@@ -77,21 +79,19 @@ func fileOutPutTodosWithStreamBench(db *gorm.DB, fileName string) error {
 	for rows.Next() {
 		var todo Todo
 		db.ScanRows(rows, &todo)
-		val := reflect.ValueOf(todo)
-		typ := val.Type()
 
-		var fields []string
-		for i := 0; i < typ.NumField(); i++ {
-			key := typ.Field(i).Name
-			value := fmt.Sprintf("%v", val.Field(i).Interface())
-			fields = append(fields, fmt.Sprintf("%v: %v", key, value))
+		fields := []string{
+			fmt.Sprintf("ID: %v", todo.ID),
+			fmt.Sprintf("Title: %v", todo.Title),
+			fmt.Sprintf("Note: %v", todo.Note),
 		}
-		_, err := fmt.Fprintf(file, "{%s},\n", strings.Join(fields, ", "))
+
+		line := fmt.Sprintf("{%s},\n", strings.Join(fields, ", "))
+		_, err := writer.WriteString(line)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
