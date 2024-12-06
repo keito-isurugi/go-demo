@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"os"
+	"reflect"
 	"strings"
-	"sync/atomic"
 	"testing"
 )
 
@@ -14,20 +14,18 @@ func BenchmarkBatchProcessing(b *testing.B) {
 	db, _ := dbConn()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		fileOutPutTodosBatchedBench(db, "file_batched.txt")
+		FileOutPutTodosWithBufio(db, "file_batched.txt")
 		os.Remove("file_batched.txt")
 	}
 }
 
-func fileOutPutTodosBatchedBench(db *gorm.DB, fileName string) error {
+// reflect、fmt.Fprintfを使用
+func fileOutPutTodosWithRefrect(db *gorm.DB, fileName string) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-	defer writer.Flush()
 
 	var todos []Todo
 	result := db.Find(&todos)
@@ -36,13 +34,16 @@ func fileOutPutTodosBatchedBench(db *gorm.DB, fileName string) error {
 	}
 
 	for _, todo := range todos {
-		fields := []string{
-			fmt.Sprintf("ID: %v", todo.ID),
-			fmt.Sprintf("Title: %v", todo.Title),
-			fmt.Sprintf("Note: %v", todo.Note),
+		val := reflect.ValueOf(todo)
+		typ := val.Type()
+
+		var fields []string
+		for i := 0; i < typ.NumField(); i++ {
+			key := typ.Field(i).Name
+			value := fmt.Sprintf("%v", val.Field(i).Interface())
+			fields = append(fields, fmt.Sprintf("%v: %v", key, value))
 		}
-		line := fmt.Sprintf("{%s},\n", strings.Join(fields, ", "))
-		_, err := writer.WriteString(line)
+		_, err := fmt.Fprintf(file, "{%s},\n", strings.Join(fields, ", "))
 		if err != nil {
 			return err
 		}
@@ -93,40 +94,6 @@ func fileOutPutTodosWithStreamBench(db *gorm.DB, fileName string) error {
 		}
 	}
 	return nil
-}
-
-type CountingWriter struct {
-	wrapped    *bufio.Writer
-	flushCount uint64
-}
-
-func NewCountingWriter(writer *bufio.Writer) *CountingWriter {
-	return &CountingWriter{wrapped: writer}
-}
-
-func (cw *CountingWriter) Write(p []byte) (nn int, err error) {
-	nn, err = cw.wrapped.Write(p)
-	if err != nil {
-		return nn, err
-	}
-
-	// データサイズチェックと、バッファフラッシュ追加
-	if len(p) >= cw.wrapped.Available() {
-		err := cw.Flush()
-		if err != nil {
-			return nn, err
-		}
-	}
-	return nn, nil
-}
-
-func (cw *CountingWriter) Flush() error {
-	atomic.AddUint64(&cw.flushCount, 1)
-	return cw.wrapped.Flush()
-}
-
-func (cw *CountingWriter) FlushCount() uint64 {
-	return atomic.LoadUint64(&cw.flushCount)
 }
 
 func BenchmarkStreamProcessing2(b *testing.B) {
