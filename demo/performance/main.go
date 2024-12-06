@@ -26,7 +26,8 @@ func main() {
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
-	registerDummyTodos(db)
+	//registerDummyTodos(db)
+	Stream(db)
 }
 
 func FileOutPutTodosWithRefrect1(db *gorm.DB, fileName string) error {
@@ -70,7 +71,7 @@ func dbConn() (*gorm.DB, error) {
 
 type Todo struct {
 	ID        int `gorm:"primaryKey"`
-	UserID 	  int
+	UserID    int
 	Title     string
 	Note      string
 	DoneFlag  bool
@@ -104,44 +105,11 @@ func registerDummyTodos(db *gorm.DB) {
 	for i := 0; i < count; i++ {
 		t := Todo{
 			UserID: 1,
-			Title: fmt.Sprintf("ダミーTODO_%v", i+1),
-			Note:  fmt.Sprintf("ダミーで登録したTODO_%vです", i+1),
+			Title:  fmt.Sprintf("ダミーTODO_%v", i+1),
+			Note:   fmt.Sprintf("ダミーで登録したTODO_%vです", i+1),
 		}
 		db.Create(&t)
 	}
-}
-
-func fileOutPutTodos(db *gorm.DB, fileName string) error {
-	todos, err := listTodos(db)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	file, err := os.Create(fileName)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-
-	for _, todo := range todos {
-		val := reflect.ValueOf(todo)
-		typ := val.Type()
-
-		var fields []string
-		for i := 0; i < typ.NumField(); i++ {
-			key := typ.Field(i).Name
-			value := fmt.Sprintf("%v", val.Field(i).Interface())
-			fields = append(fields, fmt.Sprintf("%v: %v", key, value))
-		}
-		// カンマで区切り、波括弧で囲んだフィールドのリストをテキストファイルに書き込む
-		_, err := fmt.Fprintf(file, "{%s},\n", strings.Join(fields, ", "))
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	fmt.Println("file output done.")
-	return nil
 }
 
 func fileOutPutTodosWithStream(db *gorm.DB, fileName string) error {
