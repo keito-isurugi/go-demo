@@ -3,10 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"gorm.io/gorm"
+	"io"
 	"os"
+	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
+
+	"gorm.io/gorm"
 )
 
 func Stream(db *gorm.DB) {
@@ -72,6 +76,70 @@ func FileOutPutTodosWithBufio(db *gorm.DB, fileName string) error {
 		}
 		line := fmt.Sprintf("{%s},\n", strings.Join(fields, ", "))
 		_, err = writer.Write([]byte(line))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+var bufWriterPool = &sync.Pool{
+	New: func() any {
+		return bufio.NewWriter(nil)
+	},
+}
+
+func getBufWriter(w io.Writer) *bufio.Writer {
+	bufw := bufWriterPool.Get().(*bufio.Writer)
+	bufw.Reset(w)
+	return bufw
+}
+
+func putBufWriter(bufw *bufio.Writer) {
+	bufw.Reset(nil)
+	bufWriterPool.Put(bufw)
+}
+
+// sync.Poolを使用
+func FileOutPutTodosWithPool(db *gorm.DB, fileName string) error {
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := getBufWriter(file)
+	defer putBufWriter(writer)
+	defer func() {
+		flushErr := writer.Flush()
+		if err == nil {
+			err = flushErr
+		}
+	}()
+
+	var todos []Todo
+	result := db.Find(&todos)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, todo := range todos {
+		fields := [][2]string{
+			{"ID", strconv.FormatInt(int64(todo.ID), 10)},
+			{"Title", todo.Title},
+			{"Note", todo.Note},
+		}
+		_ = writer.WriteByte('{')
+		for i, f := range fields {
+			if i > 0 {
+				_, _ = writer.WriteString(", ")
+			}
+			_, _ = writer.WriteString(f[0])
+			_, _ = writer.WriteString(": ")
+			_, _ = writer.WriteString(f[1])
+		}
+		_, err = writer.WriteString("},\n")
 		if err != nil {
 			return err
 		}
