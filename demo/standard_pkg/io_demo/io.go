@@ -1,4 +1,4 @@
-package main
+package iodemo
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 )
 
 
-func ioDemo() {
+func IoDemo() {
 	f, err := os.Open("test.txt") // 読み込み専用
 	// f, err := os.Create("test.txt") // 書き込み権限あり
 	defer func () { // 後続にWriteを使用する場合はerrをキャッチしたほうがいいかも
-		err := f.Close()
+		err = f.Close()
 		if err != nil {
 			fmt.Println(err)
 		}
