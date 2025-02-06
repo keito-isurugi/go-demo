@@ -23,14 +23,12 @@ func encryptAES(plainText, key string) (string, error) {
 	// AES 暗号化モジュールを作成（指定された鍵を使用）。
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		// 鍵が無効な長さの場合、エラーを返す。
 		return "", err
 	}
 
 	// GCM (Galois/Counter Mode) インスタンスを作成。
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		// GCM がサポートされていない、もしくは初期化に失敗した場合にエラーを返す。
 		return "", err
 	}
 
@@ -38,7 +36,6 @@ func encryptAES(plainText, key string) (string, error) {
 	nonce := make([]byte, gcm.NonceSize())
 	// 暗号学的に安全な乱数生成器を使用して Nonce を埋める。
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		// Nonce 生成に失敗した場合にエラーを返す。
 		return "", err
 	}
 
@@ -62,21 +59,18 @@ func decryptAES(cipherText, key string) (string, error) {
 	// AES 復号化モジュールを作成（指定された鍵を使用）。
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		// 鍵が無効な長さの場合、エラーを返す。
 		return "", err
 	}
 
 	// GCM (Galois/Counter Mode) インスタンスを作成。
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		// GCM がサポートされていない、もしくは初期化に失敗した場合にエラーを返す。
 		return "", err
 	}
 
 	// Base64 形式の暗号文をデコードしてバイトデータに変換する。
 	data, err := base64.StdEncoding.DecodeString(cipherText)
 	if err != nil {
-		// Base64 デコードに失敗した場合、エラーを返す。
 		return "", err
 	}
 
@@ -93,7 +87,6 @@ func decryptAES(cipherText, key string) (string, error) {
 	// 暗号化データを復号化して平文を取得。
 	plainText, err := gcm.Open(nil, nonce, cipherTextBytes, nil)
 	if err != nil {
-		// 復号化に失敗した場合にエラーを返す。
 		return "", err
 	}
 
