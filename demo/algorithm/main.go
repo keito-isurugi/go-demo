@@ -8,4 +8,7 @@ func main() {
 
 	ls := LinearSearch(arr, target)
 	fmt.Printf("Linear Search: %d\n", ls)
+
+	bas := BubbleAscSort(arr)
+	fmt.Printf("Bubble Asc Sort: %v\n", bas)
 }
