@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	arr := []int{5, 3, 8, 4, 2}
@@ -11,4 +13,10 @@ func main() {
 
 	bas := BubbleAscSort(arr)
 	fmt.Printf("Bubble Asc Sort: %v\n", bas)
+
+	bds := BubbleDescSort(arr)
+	fmt.Printf("Bubble Desc Sort: %v\n", bds)
+
+	bs := BinarySearch(bas, 3)
+	fmt.Printf("Binary Search: %d\n", bs)
 }
