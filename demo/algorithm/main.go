@@ -16,7 +16,7 @@ func main() {
 
 	bds := BubbleDescSort(arr)
 	fmt.Printf("Bubble Desc Sort: %v\n", bds)
-
-	bs := BinarySearch(bas, 3)
+	
+	bs := BinarySearch(bas, 8)
 	fmt.Printf("Binary Search: %d\n", bs)
 }
