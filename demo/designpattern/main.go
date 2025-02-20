@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"designpattern/factory"
 	"designpattern/adapter"
+	"designpattern/bridge"
 )
 
 func main() {
@@ -23,4 +24,7 @@ func main() {
 
 	fmt.Println("==========Adaptor Pattern==========")
 	adapter.AdapterExec()
+
+	fmt.Println("==========Bridge Pattern==========")
+	bridge.BridgeExec()
 }
