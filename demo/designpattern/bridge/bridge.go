@@ -2,74 +2,97 @@ package bridge
 
 import "fmt"
 
-type Printer interface {
-	PrintFile()
+// Device インターフェース（家電の抽象化）
+type Device interface {
+	TurnOn()
+	TurnOff()
+	SetVolume(volume int)
 }
 
-type Epson struct {
+// TV 構造体（具体的な家電: テレビ）
+type TV struct {
+	volume int
 }
 
-func (p *Epson) PrintFile() {
-	fmt.Println("Printing by a EPSON Printer")
+func (t *TV) TurnOn() {
+	fmt.Println("テレビをつけました")
 }
 
-type Computer interface {
-	Print()
-	SetPrinter(Printer)
+func (t *TV) TurnOff() {
+	fmt.Println("テレビを消しました")
 }
 
-type Mac struct {
-	printer Printer
+func (t *TV) SetVolume(volume int) {
+	t.volume = volume
+	fmt.Printf("テレビの音量を %d に設定しました\n", volume)
 }
 
-func (m *Mac) Print() {
-	fmt.Println("Print request for mac")
-	m.printer.PrintFile()
-}
-func (m *Mac) SetPrinter(p Printer) {
-	m.printer = p
+// Radio 構造体（具体的な家電: ラジオ）
+type Radio struct {
+	volume int
 }
 
-type Windows struct {
-	printer Printer
+func (r *Radio) TurnOn() {
+	fmt.Println("ラジオをつけました")
 }
 
-func (w *Windows) Print() {
-	fmt.Println("Print request for windows")
-	w.printer.PrintFile()
-}
-func (w *Windows) SetPrinter(p Printer) {
-	w.printer = p
+func (r *Radio) TurnOff() {
+	fmt.Println("ラジオを消しました")
 }
 
-type Hp struct {
+func (r *Radio) SetVolume(volume int) {
+	r.volume = volume
+	fmt.Printf("ラジオの音量を %d に設定しました\n", volume)
 }
 
-func (p *Hp) PrintFile() {
-	fmt.Println("Printing by a HP Printer")
+// RemoteControl 抽象構造体（リモコンの抽象化）
+type RemoteControl struct {
+	device Device
+}
+
+func (r *RemoteControl) TurnOn() {
+	r.device.TurnOn()
+}
+
+func (r *RemoteControl) TurnOff() {
+	r.device.TurnOff()
+}
+
+func (r *RemoteControl) VolumeUp() {
+	r.device.SetVolume(10) // 仮に10をセット
+}
+
+// AdvancedRemote 構造体（拡張リモコン）
+type AdvancedRemote struct {
+	RemoteControl
+}
+
+func (a *AdvancedRemote) Mute() {
+	a.device.SetVolume(0)
+	fmt.Println("ミュートしました")
 }
 
 func BridgeExec() {
-	hpPrinter := &Hp{}
-	epsonPrinter := &Epson{}
+	tv := &TV{}
+	radio := &Radio{}
 
-	macComputer := &Mac{}
+	basicRemote := RemoteControl{device: tv}
+	advancedRemote := AdvancedRemote{RemoteControl{device: radio}}
 
-	macComputer.SetPrinter(hpPrinter)
-	macComputer.Print()
-	fmt.Println()
+	basicRemote.TurnOn()
+	basicRemote.VolumeUp()
+	basicRemote.TurnOff()
 
-	macComputer.SetPrinter(epsonPrinter)
-	macComputer.Print()
-	fmt.Println()
-
-	winComputer := &Windows{}
-
-	winComputer.SetPrinter(hpPrinter)
-	winComputer.Print()
-	fmt.Println()
-
-	winComputer.SetPrinter(epsonPrinter)
-	winComputer.Print()
-	fmt.Println()
+	advancedRemote.TurnOn()
+	advancedRemote.Mute()
+	advancedRemote.TurnOff()
 }
+
+// 出力
+// テレビをつけました
+// テレビの音量を 10 に設定しました
+// テレビを消しました
+// ラジオをつけました
+// ラジオの音量を 0 に設定しました
+// ミュートしました
+// ラジオを消しました
