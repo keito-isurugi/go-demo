@@ -12,17 +12,38 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	// TODO:
-	// ユーザーから受け取ったリクエスト情報inputを使ってTODOを登録し、
-	// その登録されたTODOの情報をmodel.TODO型の戻り値に入れて返却
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+	return &model.Todo{
+		ID:   "TODO-3",
+		Text: input.Text,
+		User: &model.User{
+			ID:   input.UserID,
+			Name: "name",
+		},
+	}, nil
 }
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	// TODO:
-	// レスポンスに含めるTODO一覧を、戻り値[]*model.Todoに入れて返却
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+	return []*model.Todo{
+		{
+			ID:   "TODO-1",
+			Text: "My Todo 1",
+			User: &model.User{
+				ID:   "User-1",
+				Name: "hsaki",
+			},
+			Done: true,
+		},
+		{
+			ID:   "TODO-2",
+			Text: "My Todo 2",
+			User: &model.User{
+				ID:   "User-1",
+				Name: "hsaki",
+			},
+			Done: false,
+		},
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.
