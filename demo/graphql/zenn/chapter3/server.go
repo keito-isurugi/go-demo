@@ -12,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/saki-engineering/graphql-sample/graph"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/saki-engineering/graphql-sample/internal"
 )
 
 const defaultPort = "8080"
@@ -22,8 +23,7 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
-
+	srv := handler.NewDefaultServer(internal.NewExecutableSchema(internal.Config{Resolvers: &graph.Resolver{}}))
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
