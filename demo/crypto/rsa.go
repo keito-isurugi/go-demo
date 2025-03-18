@@ -48,15 +48,15 @@ func generateD(e, l int) int {
 	return d
 }
 
-// m^exp mod n
-func modExp(m, exp, n int) int {
+// m^e mod n
+func modExp(m, e, n int) int {
 	result := 1
-	for exp > 0 {
-		if exp%2 == 1 {
+	for e > 0 {
+		if e % 2 == 1 {
 			result = (result * m) % n
 		}
 		m = (m * m) % n
-		exp /= 2
+		e /= 2
 	}
 	return result
 }
