@@ -1,4 +1,4 @@
-package main
+package rsa
 
 import "fmt"
 
@@ -61,7 +61,7 @@ func modExp(m, e, n int) int {
 	return result
 }
 
-func execRSA() {
+func ExecEseRSA() {
 	n := generateN()
 	fmt.Println("N:", n)
 
