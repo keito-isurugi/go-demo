@@ -1,4 +1,4 @@
-package rsa
+package rsademo
 
 import "fmt"
 
