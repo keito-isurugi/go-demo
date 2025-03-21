@@ -16,8 +16,8 @@ func generateL() int {
 	return l
 }
 
-// - 1  < E < L
-// - gcd(E, L) = 1
+// 1 < E < L
+// gcd(E, L) = 1
 func generateE(l int) int {
 	e := 2
 	for e < l {
@@ -29,7 +29,7 @@ func generateE(l int) int {
 	return e
 }
 
-// 最大公約数
+// gcd(E, L) = 1を満たしているかをチェック
 func gcd(e, l int) int {
 	for l != 0 {
 		e, l = l, e % l
@@ -37,6 +37,8 @@ func gcd(e, l int) int {
 	return e
 }
 
+// 1 < D < L
+// E * D mod L = 1
 func generateD(e, l int) int {
 	d := 1
 	for {
@@ -74,10 +76,17 @@ func ExecEseRSA() {
 	d := generateD(e, l)
 	fmt.Println("D:", d)
 
-	target := 8
-	fmt.Println("Target:", target)
-	c := modExp(target, e, n)
-	fmt.Println("C:", c)
-	d = modExp(c, d, n)
-	fmt.Println("D:", d)
+	// N未満の数値を指定
+	target := 8 
+	encrypted := modExp(target, e, n)
+	decrypted := modExp(encrypted, d, n)
+	
+	fmt.Println("平文:", target)
+	fmt.Println("暗号化:", encrypted)
+	fmt.Println("復号化:", decrypted)
 }
+
+// 出力
+// 平文: 8
+// 暗号化: 2
+// 復号化: 8
