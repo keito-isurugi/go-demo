@@ -106,9 +106,39 @@ func generateRSAKeyPair(bits int) (*big.Int, *big.Int, *big.Int) {
 	return n, e, d
 }
 
+// 暗号化関数
+func encryptMessage(message string, n, e *big.Int) *big.Int {
+	// メッセージを数値に変換
+	msg := new(big.Int)
+	msg.SetString(message, 10)
+
+	// 暗号化: c = m^e mod n
+	ciphertext := new(big.Int).Exp(msg, e, n)
+	return ciphertext
+}
+
+// 復号化関数
+func decryptMessage(ciphertext, n, d *big.Int) string {
+	// 復号化: m = c^d mod n
+	plaintext := new(big.Int).Exp(ciphertext, d, n)
+
+	// 復号化された数値を文字列に変換
+	return plaintext.String()
+}
+
 func ExecRSA() {
-	n, e, b := generateRSAKeyPair(capacity)
-	fmt.Println("n: ", n)
-	fmt.Println("e: ", e)
-	fmt.Println("b: ", b)
+	// 鍵ペアを生成
+	n, e, d := generateRSAKeyPair(capacity)
+
+	// メッセージ
+	message := "1234567890" // 数字の文字列を例に使用
+	fmt.Printf("元のメッセージ: %s\n", message)
+
+	// メッセージの暗号化
+	ciphertext := encryptMessage(message, n, e)
+	fmt.Printf("暗号化されたメッセージ: %s\n", ciphertext.String())
+
+	// メッセージの復号化
+	plaintext := decryptMessage(ciphertext, n, d)
+	fmt.Printf("復号化されたメッセージ: %s\n", plaintext)
 }
