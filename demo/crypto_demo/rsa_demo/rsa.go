@@ -1,7 +1,9 @@
 package rsademo
 
 import (
+	"bytes"
 	"crypto/rand"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"math/big"
@@ -106,11 +108,46 @@ func generateRSAKeyPair(bits int) (*big.Int, *big.Int, *big.Int) {
 	return n, e, d
 }
 
+// バイトスライスを数値に変換する関数
+func bytesToBigInt(data []byte) *big.Int {
+	return new(big.Int).SetBytes(data)
+}
+
+// 数値をバイトスライスに変換する関数
+func bigIntToBytes(n *big.Int) []byte {
+	return n.Bytes()
+}
+
+// メッセージをバイト列に変換する関数
+func stringToBytes(message string) []byte {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(message)
+	if err != nil {
+		log.Fatalf("メッセージのエンコードに失敗しました: %v", err)
+	}
+	return buf.Bytes()
+}
+
+// バイト列を文字列に変換する関数
+func bytesToString(data []byte) string {
+	var message string
+	buf := bytes.NewReader(data)
+	dec := gob.NewDecoder(buf)
+	err := dec.Decode(&message)
+	if err != nil {
+		log.Fatalf("メッセージのデコードに失敗しました: %v", err)
+	}
+	return message
+}
+
 // 暗号化関数
 func encryptMessage(message string, n, e *big.Int) *big.Int {
-	// メッセージを数値に変換
-	msg := new(big.Int)
-	msg.SetString(message, 10)
+	// メッセージをバイト列に変換
+	messageBytes := stringToBytes(message)
+
+	// バイト列を数値に変換
+	msg := bytesToBigInt(messageBytes)
 
 	// 暗号化: c = m^e mod n
 	ciphertext := new(big.Int).Exp(msg, e, n)
@@ -122,16 +159,22 @@ func decryptMessage(ciphertext, n, d *big.Int) string {
 	// 復号化: m = c^d mod n
 	plaintext := new(big.Int).Exp(ciphertext, d, n)
 
-	// 復号化された数値を文字列に変換
-	return plaintext.String()
+	// 数値をバイト列に変換
+	plaintextBytes := bigIntToBytes(plaintext)
+
+	// バイト列を文字列に変換
+	return bytesToString(plaintextBytes)
 }
 
 func ExecRSA() {
 	// 鍵ペアを生成
 	n, e, d := generateRSAKeyPair(capacity)
+	fmt.Println("N:", n)
+	fmt.Println("E:", e)
+	fmt.Println("D:", d)
 
 	// メッセージ
-	message := "1234567890" // 数字の文字列を例に使用
+	message := "これはテストメッセージです！RSAで暗号化しています。"
 	fmt.Printf("元のメッセージ: %s\n", message)
 
 	// メッセージの暗号化
