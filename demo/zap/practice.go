@@ -46,19 +46,19 @@ func customEncoder() zapcore.Encoder {
 
 // カスタムロガー
 func initLogger() *zap.Logger {
-	core := zapcore.NewCore(
-		zapcore.RegisterHooks(
-			customEncoder(),
-			func(entry zapcore.Entry) error {
-				// ここでログのフック処理を追加可能（例: 特定のレベル以上のログを別の出力に送る）
-				return nil
-			},
-		),
-		zapcore.AddSync(zapcore.Lock(zapcore.AddSync(zap.NewExample().Core()))),
-		zap.InfoLevel,
-	)
+	cfg := zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		Encoding:    "json",
+		EncoderConfig: zap.NewProductionEncoderConfig(),
+		OutputPaths: []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
 
-	return zap.New(core)
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(fmt.Sprintf("failed to initialize logger: %v", err))
+	}
+	return logger
 }
 
 // リクエストIDを取得
