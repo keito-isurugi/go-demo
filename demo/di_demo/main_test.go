@@ -16,7 +16,6 @@ func (m *MockTimeProvider) Now() time.Time {
 
 func TestIsExpired(t *testing.T) {
 	deadline := time.Date(2025, 5, 9, 12, 0, 0, 0, time.Local)
-
 	tests := []struct {
 		name     string
 		now      time.Time
