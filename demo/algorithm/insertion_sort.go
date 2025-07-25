@@ -56,7 +56,6 @@ func InsertionSortWithSteps(arr []int) []int {
 
 // RunInsertionSortDemo は挿入ソートのデモを実行します
 func RunInsertionSortDemo() {
-	// サンプルデータ
 	samples := [][]int{
 		{64, 34, 25, 12, 22, 11, 90},
 		{5, 2, 4, 6, 1, 3},
@@ -65,17 +64,10 @@ func RunInsertionSortDemo() {
 		{10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
 	}
 	
-	fmt.Println("=== 挿入ソートのデモ ===")
-	
 	for i, sample := range samples {
 		fmt.Printf("\n例 %d:\n", i+1)
 		fmt.Printf("ソート前: %v\n", sample)
 		sorted := InsertionSort(sample)
 		fmt.Printf("ソート後: %v\n", sorted)
 	}
-	
-	// ステップ表示のデモ
-	fmt.Println("\n=== ステップごとの表示 ===")
-	demo := []int{5, 2, 4, 6, 1, 3}
-	InsertionSortWithSteps(demo)
 }

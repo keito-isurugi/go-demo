@@ -20,14 +20,17 @@ func main() {
 	// bs := BinarySearch(bas, 8)
 	// fmt.Printf("Binary Search: %d\n", bs)
 
-	fmt.Println("\n--- Bit全探索のデモ ---")
+	// fmt.Println("\n--- Bit全探索のデモ ---")
 	
 	// 合計が特定の値になる組み合わせの数を求める
-	fmt.Println("\n2. 合計が特定の値になる組み合わせの数:")
+	// fmt.Println("\n2. 合計が特定の値になる組み合わせの数:")
 	
 	// 3種類の数値から合計4になる組み合わせ
-	nums1 := []int{1, 2, 3}
-	target1 := 4
-	count1 := CountSubsetSum(nums1, target1)
-	fmt.Println(count1, "通り")
+	// nums1 := []int{1, 2, 3}
+	// target1 := 4
+	// count1 := CountSubsetSum(nums1, target1)
+	// fmt.Println(count1, "通り")
+
+	fmt.Println("\n--- 挿入ソートのデモ ---")
+	RunInsertionSortDemo()
 }
