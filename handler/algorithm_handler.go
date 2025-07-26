@@ -54,6 +54,13 @@ func AlgorithmDemoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("二分探索(配列内の値の重複なし)：該当する値は存在しません。"))
 	}
 	w.Write([]byte("=========================\n"))
+
+	// 挿入ソート
+	isAry := generateRandomArray(1, 10)
+	w.Write([]byte(fmt.Sprintf("挿入ソート - ソート前: %v\n", isAry)))
+	isSorted := algorithm.InsertionSort(isAry)
+	w.Write([]byte(fmt.Sprintf("挿入ソート - ソート後: %v\n", isSorted)))
+	w.Write([]byte("=========================\n"))
 }
 
 func generateRandomArray(min, max int) []int {
