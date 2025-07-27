@@ -31,6 +31,9 @@ func main() {
 	// count1 := CountSubsetSum(nums1, target1)
 	// fmt.Println(count1, "通り")
 
-	fmt.Println("\n--- 挿入ソートのデモ ---")
-	RunInsertionSortDemo()
+	// fmt.Println("\n--- 挿入ソートのデモ ---")
+	// RunInsertionSortDemo()
+	
+	fmt.Println("\n--- クイックソートのデモ ---")
+	RunQuickSortDemo()
 }
