@@ -36,4 +36,10 @@ func main() {
 	
 	fmt.Println("\n--- クイックソートのデモ ---")
 	RunQuickSortDemo()
+	
+	fmt.Println("\n--- マージソートのデモ ---")
+	RunMergeSortDemo()
+	
+	fmt.Println("\n--- ヒープソートのデモ ---")
+	RunHeapSortDemo()
 }
