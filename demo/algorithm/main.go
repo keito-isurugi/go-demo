@@ -42,4 +42,7 @@ func main() {
 	
 	fmt.Println("\n--- ヒープソートのデモ ---")
 	RunHeapSortDemo()
+	
+	fmt.Println("\n--- フィボナッチ数列のデモ ---")
+	RunFibonacciDemo()
 }
