@@ -34,15 +34,18 @@ func main() {
 	// fmt.Println("\n--- 挿入ソートのデモ ---")
 	// RunInsertionSortDemo()
 	
-	fmt.Println("\n--- クイックソートのデモ ---")
-	RunQuickSortDemo()
+	// fmt.Println("\n--- クイックソートのデモ ---")
+	// RunQuickSortDemo()
 	
-	fmt.Println("\n--- マージソートのデモ ---")
-	RunMergeSortDemo()
+	// fmt.Println("\n--- マージソートのデモ ---")
+	// RunMergeSortDemo()
 	
 	fmt.Println("\n--- ヒープソートのデモ ---")
 	RunHeapSortDemo()
 	
 	fmt.Println("\n--- フィボナッチ数列のデモ ---")
 	RunFibonacciDemo()
+	
+	fmt.Println("\n--- 階乗計算のデモ ---")
+	FactorialDemo()
 }
