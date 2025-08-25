@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"algorithm/recursion"
 )
 
 func main() {
@@ -40,12 +42,30 @@ func main() {
 	// fmt.Println("\n--- マージソートのデモ ---")
 	// RunMergeSortDemo()
 	
-	fmt.Println("\n--- ヒープソートのデモ ---")
-	RunHeapSortDemo()
+	// fmt.Println("\n--- ヒープソートのデモ ---")
+	// RunHeapSortDemo()
 	
-	fmt.Println("\n--- フィボナッチ数列のデモ ---")
-	RunFibonacciDemo()
+	// fmt.Println("\n--- フィボナッチ数列のデモ ---")
+	// RunFibonacciDemo()
 	
-	fmt.Println("\n--- 階乗計算のデモ ---")
-	FactorialDemo()
+	// fmt.Println("\n--- 階乗計算のデモ ---")
+	// FactorialDemo()
+
+	fmt.Println("\n--- 再帰関数のデモ ---")
+	// result := recursion.Factorial(5)
+	// fmt.Println(result)
+
+	// result2 := recursion.FactorialWithFor(5)
+	// fmt.Println(result2)
+
+	// result3 := recursion.CountDown(5)
+	// fmt.Println(result3)
+
+	// recursion.CountDownWithFor(5)
+
+	result4 := recursion.Sum(5)
+	fmt.Println(result4)
+
+	result5 := recursion.SumWithFor(5)
+	fmt.Println(result5)
 }
