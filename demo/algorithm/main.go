@@ -63,9 +63,17 @@ func main() {
 
 	// recursion.CountDownWithFor(5)
 
-	result4 := recursion.Sum(5)
-	fmt.Println(result4)
+	// result4 := recursion.Sum(5)
+	// fmt.Println(result4)
 
-	result5 := recursion.SumWithFor(5)
-	fmt.Println(result5)
+	// result5 := recursion.SumWithFor(5)
+	// fmt.Println(result5)
+
+	arr := []int{1, 2, 3, 4, 5}
+	_ = recursion.PrintArray(arr, 0)
+	// recursion.PrintArrayWithFor(arr)
+
+	// fmt.Println(arr[:2])
+	// arr2 := append(arr[:0], arr[3:]...)
+	// fmt.Println(arr2)
 }

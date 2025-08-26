@@ -55,3 +55,21 @@ func SumWithFor(n int) int {
 	}
 	return result
 }
+
+// 配列の要素を1つずつ表示
+func PrintArray(arr []int, n int) int {
+	if n >= len(arr) {
+		return 0
+	}
+	fmt.Println(arr[n])
+	return PrintArray(arr, n + 1)
+}
+
+func PrintArrayWithFor(arr []int) {
+	if len(arr) <= 0 {
+		fmt.Println("array is empty")
+	}
+	for i := 0; i < len(arr); i++ {
+		fmt.Println(arr[i])	
+	}
+}
