@@ -69,11 +69,18 @@ func main() {
 	// result5 := recursion.SumWithFor(5)
 	// fmt.Println(result5)
 
-	arr := []int{1, 2, 3, 4, 5}
-	_ = recursion.PrintArray(arr, 0)
+	// arr := []int{1, 2, 3, 4, 5}
+	// _ = recursion.PrintArray(arr, 0)
 	// recursion.PrintArrayWithFor(arr)
 
 	// fmt.Println(arr[:2])
 	// arr2 := append(arr[:0], arr[3:]...)
 	// fmt.Println(arr2)
+
+	// 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144
+	result6 := recursion.Fibonacci(10)
+	fmt.Println(result6)
+
+	result7 := recursion.FibonacciWithFor(10)
+	fmt.Println(result7)
 }
