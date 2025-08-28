@@ -33,3 +33,29 @@ func FibonacciWithFor(n int) int {
 	}
 	return b
 }
+
+// 配列の合計
+// [1, 2, 4, 10] = 17
+// 0 = 1 + sum(arr, 1) = 1 + 16 = 17
+// 1 = 2 + sum(arr, 2) = 2 + 14 = 16
+// 2 = 4 + sum(arr, 3) = 4 + 10 = 14
+// 3 = 10 + sum(arr, 4) = 10 + 0 = 10 
+// 4 = 0 
+func SumArray(arr []int, n int) int {
+	if n >= len(arr){
+		return 0
+	}
+	return arr[n] + SumArray(arr, n + 1)
+}
+
+func SumArrayWithFor(arr []int) int {
+	if len(arr) <= 0 {
+		return 0
+	}
+	
+	sum := 0
+	for i := 0; i < len(arr); i++ {
+		sum = sum + arr[i]
+	}
+	return sum
+}
