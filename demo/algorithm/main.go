@@ -90,4 +90,7 @@ func main() {
 
 	result9 := recursion.SumArrayWithFor(arr)
 	fmt.Println(result9)
+
+	num := 5 / 2
+	fmt.Println(num)
 }

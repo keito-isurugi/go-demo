@@ -1,7 +1,5 @@
 package recursion
 
-// import "fmt"
-
 // n番目のフィボナッチ数を返す
 // fib(5) = fib(4) + fib(3) = 3 + 2 = 5
 // fib(4) = fib(3) + fib(2) = 2 + 1 = 3
