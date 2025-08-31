@@ -84,13 +84,19 @@ func main() {
 	// result7 := recursion.FibonacciWithFor(10)
 	// fmt.Println(result7)
 
-	arr := []int{1, 2, 4, 10}
-	result8 := recursion.SumArray(arr, 0)
-	fmt.Println(result8)
+	// arr := []int{1, 2, 4, 10}
+	// result8 := recursion.SumArray(arr, 0)
+	// fmt.Println(result8)
 
-	result9 := recursion.SumArrayWithFor(arr)
-	fmt.Println(result9)
+	// result9 := recursion.SumArrayWithFor(arr)
+	// fmt.Println(result9)
 
-	num := 5 / 2
-	fmt.Println(num)
+	// num := 5 / 2
+	// fmt.Println(num)
+
+	arr2 := []int{1, 2, 3, 4, 5, 6}
+	for _, v := range arr2 {
+		result10 := recursion.BinarySearchWithFor(arr2, v)
+		fmt.Println(result10)
+	}
 }
