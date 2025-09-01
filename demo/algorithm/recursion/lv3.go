@@ -17,8 +17,28 @@ import "fmt"
 // ary[6 / 2] = 3
 // 6 > 3
 
-// func BinarySearch(arr []int, target int) int {
-// }
+func BinarySearch(arr []int, target, left, right int) int {
+	if len(arr) <= 0 {
+		fmt.Println("array is empty")
+		return -1
+	}
+	
+	mid := (left + right) / 2
+	
+	if target == arr[mid] {
+		return mid
+	}
+	
+	if target > arr[mid] {
+		return BinarySearch(arr, target, mid + 1, right)
+	} else {
+		return BinarySearch(arr, target, left, mid - 1)
+	}
+	
+	fmt.Println("target not found")
+	return -1
+}
+
 
 func BinarySearchWithFor(arr []int, target int) int {
 	if len(arr) <= 0 {

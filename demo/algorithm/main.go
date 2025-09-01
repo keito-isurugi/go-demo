@@ -95,8 +95,14 @@ func main() {
 	// fmt.Println(num)
 
 	arr2 := []int{1, 2, 3, 4, 5, 6}
+
 	for _, v := range arr2 {
 		result10 := recursion.BinarySearchWithFor(arr2, v)
 		fmt.Println(result10)
 	}
+
+	// for _, v := range arr2 {
+	// 	result10 := recursion.BinarySearchWithFor(arr2, v)
+	// 	fmt.Println(result10)
+	// }
 }
