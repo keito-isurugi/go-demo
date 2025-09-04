@@ -94,15 +94,41 @@ func main() {
 	// num := 5 / 2
 	// fmt.Println(num)
 
-	arr2 := []int{1, 2, 3, 4, 5, 6}
-
-	for _, v := range arr2 {
-		result10 := recursion.BinarySearchWithFor(arr2, v)
-		fmt.Println(result10)
-	}
+	// arr2 := []int{1, 2, 3, 4, 5, 6}
 
 	// for _, v := range arr2 {
 	// 	result10 := recursion.BinarySearchWithFor(arr2, v)
 	// 	fmt.Println(result10)
 	// }
+
+	// for _, v := range arr2 {
+	// 	result10 := recursion.BinarySearchWithFor(arr2, v)
+	// 	fmt.Println(result10)
+	// }
+
+	// recursion.Tree()
+	
+	// ハノイの塔のデモ
+	// fmt.Println("\n--- ハノイの塔（再帰）のデモ ---")
+	
+	// // 3枚のディスクでシミュレーション
+	// fmt.Println("■ 3枚のディスクでシミュレーション:")
+	// recursion.SimulateTowerOfHanoi(3)
+	
+	// // ステップ表示版（再帰呼び出しの様子を表示）
+	// fmt.Println("\n■ 再帰呼び出しの詳細（3枚）:")
+	// recursion.TowerOfHanoiWithSteps(3, "A", "C", "B", 0)
+	
+	// // 移動回数の計算
+	// fmt.Println("\n■ ディスク枚数と移動回数:")
+	// for n := 1; n <= 10; n++ {
+	// 	moves := recursion.CountHanoiMoves(n)
+	// 	fmt.Printf("  %2d枚: %d回\n", n, moves)
+	// }
+
+	// recursion.TreeWithFor()
+	
+	// 配列の逆順（再帰）のデモ
+	fmt.Println("\n--- 配列の逆順（再帰）のデモ ---")
+	recursion.ReverseArrayDemo()
 }
