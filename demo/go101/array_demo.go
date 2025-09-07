@@ -1,19 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
-
-func main() {
-	// 固定長配列
-	// fixedArray()
-
-	// 可変長配列(スライス)
-	// VariableArray()
-
-	// マップ
-	Map()
-}
+import "fmt"
 
 // 固定長配列
 func FixedArray() {
@@ -82,7 +69,12 @@ func VariableArray() {
 
 // マップ
 func Map() {
-	// 宣言(初期化)
+	// 宣言(初期化) 長さ0のnilのマップが作成される
 	var map1 map[int]int
 	fmt.Println(map1)
+
+	// 代入
+	map1[1] = 100
+	// 参照
+	fmt.Println(map1[1])
 }
