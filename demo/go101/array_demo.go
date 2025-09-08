@@ -3,10 +3,9 @@ package main
 import "fmt"
 
 // 固定長配列
+// goは配列のサイズも含め型
+// 要素を増やしたり減らしたりはできない
 func FixedArray() {
-	// goは配列のサイズも含め型
-	// 要素を増やしたり減らしたりはできない
-
 	// 宣言(初期化) [サイズ]型
 	var arr1 [4]int
 	fmt.Println(arr1)
@@ -27,10 +26,9 @@ func FixedArray() {
 }
 
 // 可変長配列(スライス)
+// 要素の追加や削除をできる配列
+// 基本的にこっちを使う
 func VariableArray() {
-	// 要素の追加や削除をできる配列
-	// 基本的にこっちを使う
-	
 	// 宣言(初期化) []型
 	var arr1 []int
 	fmt.Println(arr1)
@@ -68,13 +66,22 @@ func VariableArray() {
 }
 
 // マップ
+// キーと値のペアを管理するデータ構造
 func Map() {
 	// 宣言(初期化) 長さ0のnilのマップが作成される
+	// 代入や参照はできない
 	var map1 map[int]int
 	fmt.Println(map1)
 
+	// makeで初期化
+	map2 := make(map[int]int)
 	// 代入
-	map1[1] = 100
+	map2[1] = 100
+	map2[2] = 200
 	// 参照
-	fmt.Println(map1[1])
+	fmt.Println(map2)
+	fmt.Println(map2[1])
+	// 削除
+	delete(map2, 1)
+	fmt.Println(map2)
 }
