@@ -63,6 +63,12 @@ func VariableArray() {
 	// 要素を削除(インデックス3の要素を削除)
 	arr3 = append(arr3[:3], arr3[4:]...)
 	fmt.Println(arr3)
+
+	// cap
+	// あらかじめサイズ、容量を確保しておくと内部配列の再割り当てが発生しないので高速になる
+	arr4 := make([]int, 3, 5)
+	fmt.Println(len(arr4))
+	fmt.Println(cap(arr4))
 }
 
 // マップ
@@ -84,4 +90,26 @@ func Map() {
 	// 削除
 	delete(map2, 1)
 	fmt.Println(map2)
+}
+
+// スライスやマップのループ
+func ArrLoop() {
+	// スライスのループ
+	// インデックスを使用したループ
+	slice1 := []int{1, 2, 3, 4, 5}
+	for i := 0; i < len(slice1); i++ {
+		fmt.Println(i, slice1[i])
+	}
+	
+	// rangeを使用したループ
+	for i, v := range slice1 {
+		fmt.Println(i, v)
+	}
+
+	// マップのループ(順番は保証されない)
+	map1 := map[int]int{1: 100, 2: 200, 3: 300}
+	// rangeを使用したループ
+	for k, v := range map1 {
+		fmt.Println(k, v)
+	}
 }

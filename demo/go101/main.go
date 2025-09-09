@@ -8,6 +8,9 @@ func main() {
 	// VariableArray()
 
 	// マップ
-	Map()
+	// Map()
+
+	// スライスやマップのループ
+	ArrLoop()
 }
 
