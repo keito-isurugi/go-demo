@@ -90,6 +90,12 @@ func Map() {
 	// 削除
 	delete(map2, 1)
 	fmt.Println(map2)
+
+	// 存在確認
+	map3 := map[int]int{1: 100, 2: 200, 3: 300}
+	if v, ok := map3[1]; ok {
+		fmt.Println("v:", v)
+	}
 }
 
 // スライスやマップのループ

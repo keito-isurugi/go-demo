@@ -11,6 +11,9 @@ func main() {
 	// Map()
 
 	// スライスやマップのループ
-	ArrLoop()
+	// ArrLoop()
+
+	// ループ
+	LoopDemo()
 }
 
