@@ -17,6 +17,9 @@ func main() {
 	// LoopDemo()
 
 	// 条件分岐
-	ConditionalBranch()
+	// ConditionalBranch()
+
+	// ソート
+	SortDemo()
 }
 
