@@ -1,4 +1,4 @@
-package main
+package algorithm
 
 func BinarySearch(array []int, target int) int {
 	left, right := 0, len(array) - 1

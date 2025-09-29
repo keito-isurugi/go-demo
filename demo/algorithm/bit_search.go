@@ -1,4 +1,4 @@
-package main
+package algorithm
 
 import (
 	"fmt"
@@ -38,11 +38,11 @@ func PrintSubset(items []string, bit int) {
 	fmt.Println("}")
 }
 
-// SubsetSum は集合の中から合計が target になる部分集合を探す関数
+// SubsetSumBitSearch は集合の中から合計が target になる部分集合を探す関数
 // nums: 数値の集合
 // target: 目標の合計値
 // 戻り値: 条件を満たす部分集合のビット表現のスライス
-func SubsetSum(nums []int, target int) []int {
+func SubsetSumBitSearch(nums []int, target int) []int {
 	n := len(nums)
 	var result []int
 	

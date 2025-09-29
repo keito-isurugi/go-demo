@@ -1,4 +1,4 @@
-package main
+package algorithm
 
 func BubbleAscSort(array []int) []int {
 	sortedArray := append([]int(nil), array...)

@@ -1,3 +1,3 @@
-module algorithm
+module github.com/keito-isurugi/go-demo/demo/algorithm
 
-go 1.23.0
+go 1.22.2
