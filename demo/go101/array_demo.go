@@ -23,6 +23,13 @@ func FixedArray() {
 
 	// サイズ
 	fmt.Println(len(arr2))
+
+	// 多次元配列
+	arr3 := [2][3]int{
+		{1, 2, 3},
+		{4, 5, 6},
+	}
+	fmt.Println(arr3)
 }
 
 // 可変長配列(スライス)
@@ -69,6 +76,15 @@ func VariableArray() {
 	arr4 := make([]int, 3, 5)
 	fmt.Println(len(arr4))
 	fmt.Println(cap(arr4))
+
+	// 多次元スライス
+	arr5 := [][]int{
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 9},
+	}
+	fmt.Println(arr5)
+
 }
 
 // マップ
