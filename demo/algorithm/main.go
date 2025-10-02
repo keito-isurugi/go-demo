@@ -1,4 +1,4 @@
-package main
+package algorithm
 
 import (
 	"fmt"
@@ -145,8 +145,16 @@ func main() {
 	// DemoFibonacciDP()
 
 	// 部分和問題（動的計画法）のデモ
-	fmt.Println("\n--- 部分和問題（動的計画法）のデモ ---")
-	DemoSubsetSum()
+	// fmt.Println("\n--- 部分和問題（動的計画法）のデモ ---")
+	// DemoSubsetSum()
+
+	// 深さ優先探索（DFS）のデモ
+	// fmt.Println("\n--- 深さ優先探索（DFS）のデモ ---")
+	// DFSDemo()
+
+	// スライディングウィンドウのデモ
+	fmt.Println("\n--- スライディングウィンドウのデモ ---")
+	DemoSlidingWindow()
 }
 
 // RunGCDDemo は最大公約数（ユークリッドの互除法）のデモを実行
