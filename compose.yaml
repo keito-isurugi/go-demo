@@ -41,6 +41,15 @@ services:
       - db
     networks:
       - go-demo-network
+  redis:
+    container_name: go-demo-redis
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./persist/redis:/data
+    networks:
+      - go-demo-network
 networks:
   go-demo-network:
     driver: bridge
