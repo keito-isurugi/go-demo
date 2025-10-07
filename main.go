@@ -6,6 +6,7 @@ import (
 
 	"github.com/keito-isurugi/go-demo/books"
 	"github.com/keito-isurugi/go-demo/handler"
+	"github.com/keito-isurugi/go-demo/middleware"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -64,6 +65,50 @@ func main() {
 	http.HandleFunc("/demo/cache/without", cacheHandler.CacheWithoutHandler) 
 	// Redisキャッシュをクリア
 	http.HandleFunc("/demo/cache/clear", cacheHandler.ClearCacheHandler)
+
+	// レート制限付きAPI (1分間に10回まで)
+	rateLimiter := middleware.NewRateLimiter(10, time.Minute)
+	http.Handle("/api/limited", rateLimiter.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Success! This endpoint is rate-limited to 10 requests per minute."}`))
+	})))
+
+	// セキュリティデモAPI
+	securityHandler := &handler.SecurityDemoHandler{DB: dbConn}
+	// 情報エンドポイント
+	http.HandleFunc("/api/security", securityHandler.SecurityInfoHandler)
+
+	// CORS デモ
+	http.HandleFunc("/api/security/cors/vulnerable", securityHandler.CORSVulnerableHandler)
+	http.HandleFunc("/api/security/cors/secure", securityHandler.CORSSecureHandler)
+
+	// CSRF デモ
+	http.HandleFunc("/api/security/csrf/token", securityHandler.CSRFTokenHandler)
+	http.HandleFunc("/api/security/csrf/vulnerable", securityHandler.CSRFVulnerableHandler)
+	http.HandleFunc("/api/security/csrf/secure", securityHandler.CSRFSecureHandler)
+
+	// XSS デモ
+	http.HandleFunc("/api/security/xss/vulnerable", securityHandler.XSSVulnerableHandler)
+	http.HandleFunc("/api/security/xss/secure", securityHandler.XSSSecureHandler)
+
+	// SQL Injection デモ
+	http.HandleFunc("/api/security/sql-injection/vulnerable", securityHandler.SQLInjectionVulnerableHandler)
+	http.HandleFunc("/api/security/sql-injection/secure", securityHandler.SQLInjectionSecureHandler)
+
+	// 並列URL取得API
+	parallelFetchHandler := &handler.ParallelFetchHandler{}
+	// 最速レスポンスを返す
+	http.HandleFunc("/api/fetch/fastest", parallelFetchHandler.FetchFastestHandler)
+	// 全結果を返す
+	http.HandleFunc("/api/fetch/all", parallelFetchHandler.FetchAllHandler)
+
+	// 複数API並列実行・集約API
+	aggregateHandler := &handler.AggregateAPIHandler{}
+	// カスタムAPIを並列実行して集約
+	http.HandleFunc("/api/aggregate", aggregateHandler.AggregateHandler)
+	// プリセットAPIを並列実行して集約（デモ用）
+	http.HandleFunc("/api/aggregate/preset", aggregateHandler.PresetAggregateHandler)
 
 	fmt.Println("localhost:8080 server runnig ...")
     log.Fatal(http.ListenAndServe(":8080", nil))

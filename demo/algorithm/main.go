@@ -153,8 +153,17 @@ func main() {
 	// DFSDemo()
 
 	// スライディングウィンドウのデモ
-	fmt.Println("\n--- スライディングウィンドウのデモ ---")
-	DemoSlidingWindow()
+	// fmt.Println("\n--- スライディングウィンドウのデモ ---")
+	// DemoSlidingWindow()
+
+	// キャッシュアルゴリズムのデモ
+	// fmt.Println("\n--- キャッシュアルゴリズムのデモ ---")
+	// DemoCacheAlgorithms()
+
+	// Sticky Sessionのデモ
+	fmt.Println("\n--- Sticky Sessionのデモ ---")
+	DemoStickySession()
+	DemoStickySessionPerformance()
 }
 
 // RunGCDDemo は最大公約数（ユークリッドの互除法）のデモを実行
