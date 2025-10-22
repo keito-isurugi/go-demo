@@ -161,9 +161,17 @@ func main() {
 	// DemoCacheAlgorithms()
 
 	// Sticky Sessionのデモ
-	fmt.Println("\n--- Sticky Sessionのデモ ---")
-	DemoStickySession()
-	DemoStickySessionPerformance()
+	// fmt.Println("\n--- Sticky Sessionのデモ ---")
+	// DemoStickySession()
+	// DemoStickySessionPerformance()
+
+	// Two Pointersのデモ
+	// fmt.Println("\n--- Two Pointersのデモ ---")
+	// DemoTwoPointers()
+
+	// エラトステネスの篩のデモ
+	fmt.Println("\n--- エラトステネスの篩のデモ ---")
+	DemoSieveOfEratosthenes()
 }
 
 // RunGCDDemo は最大公約数（ユークリッドの互除法）のデモを実行
