@@ -9,31 +9,43 @@ type DisplayImpl interface {
 type Display struct {
 	impl DisplayImpl
 }
-func newDisplay(di DisplayImpl) *Display{
+
+// NewDisplay creates a new Display instance
+func NewDisplay(di DisplayImpl) *Display {
 	return &Display{impl: di}
 }
-func (d *Display) open() {
+
+// Open opens the display
+func (d *Display) Open() {
 	d.impl.rawOpen()
 }
-func (d *Display) print() {
+
+// Print prints to the display
+func (d *Display) Print() {
 	d.impl.rawPrint()
 }
-func (d *Display) close() {
+
+// Close closes the display
+func (d *Display) Close() {
 	d.impl.rawClose()
 }
 
 type CountDisplay struct {
 	Display *Display
 }
-func newCountDisplay(impl DisplayImpl) *CountDisplay {
+
+// NewCountDisplay creates a new CountDisplay instance
+func NewCountDisplay(impl DisplayImpl) *CountDisplay {
 	return &CountDisplay{
-		Display: newDisplay(impl),
+		Display: NewDisplay(impl),
 	}
 }
-func (cd *CountDisplay) multiDisplay(times int) {
-	cd.Display.open()
+
+// MultiDisplay displays multiple times
+func (cd *CountDisplay) MultiDisplay(times int) {
+	cd.Display.Open()
 	for i := 0; i < times; i++ {
-		cd.Display.print()
+		cd.Display.Print()
 	}
-	cd.Display.close()
+	cd.Display.Close()
 }

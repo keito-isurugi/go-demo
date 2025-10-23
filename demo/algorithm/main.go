@@ -274,12 +274,10 @@ func RunGCDDemo() {
 	a, b := 1234567890, 987654321
 
 	// 再帰版
-	start := fmt.Sprintf("GCD (再帰): ")
 	gcdRec := GCD(a, b)
-	fmt.Printf("%s GCD(%d, %d) = %d\n", start, a, b, gcdRec)
+	fmt.Printf("GCD (再帰): GCD(%d, %d) = %d\n", a, b, gcdRec)
 
 	// 反復版
-	start2 := fmt.Sprintf("GCD (反復): ")
 	gcdIter := GCDIterative(a, b)
-	fmt.Printf("%s GCD(%d, %d) = %d\n", start2, a, b, gcdIter)
+	fmt.Printf("GCD (反復): GCD(%d, %d) = %d\n", a, b, gcdIter)
 }

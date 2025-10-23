@@ -52,7 +52,9 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -62,7 +64,9 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -79,7 +83,9 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 	result.TotalDuration = time.Since(startTime).Milliseconds()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		return
+	}
 }
 
 // fetchURLsParallel は複数のURLを並列で取得し、最速のレスポンスを返す
@@ -199,7 +205,9 @@ func (h *ParallelFetchHandler) FetchAllHandler(w http.ResponseWriter, r *http.Re
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -209,7 +217,9 @@ func (h *ParallelFetchHandler) FetchAllHandler(w http.ResponseWriter, r *http.Re
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -250,5 +260,7 @@ func (h *ParallelFetchHandler) FetchAllHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }

@@ -83,7 +83,9 @@ func (h *AggregateAPIHandler) AggregateHandler(w http.ResponseWriter, r *http.Re
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -93,7 +95,9 @@ func (h *AggregateAPIHandler) AggregateHandler(w http.ResponseWriter, r *http.Re
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -128,7 +132,9 @@ func (h *AggregateAPIHandler) AggregateHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // executeAPIsParallel は複数APIを並列で実行
@@ -300,5 +306,7 @@ func (h *AggregateAPIHandler) PresetAggregateHandler(w http.ResponseWriter, r *h
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }

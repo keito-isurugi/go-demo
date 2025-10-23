@@ -14,5 +14,7 @@ func TimeDemoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(t)
 	fmt.Println(addTwoMonth)
 
-	w.Write([]byte("demo of time"))
+	if _, err := w.Write([]byte("demo of time")); err != nil {
+		return
+	}
 }

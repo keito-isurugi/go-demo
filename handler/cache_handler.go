@@ -111,9 +111,11 @@ func (h *CacheHandler) ClearCacheHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"message": "Cache cleared successfully",
-	})
+	}); err != nil {
+		return
+	}
 }
 
 // InitTestDataHandler - テストデータ作成用API
@@ -150,21 +152,18 @@ func (h *CacheHandler) InitTestDataHandler(w http.ResponseWriter, r *http.Reques
 
 	duration := time.Since(start)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"message":      "Test data created successfully",
 		"record_count": testDataCount,
 		"duration_ms":  duration.Milliseconds(),
-	})
+	}); err != nil {
+		return
+	}
 }
 
 func writeJSONResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		return
 	}
-	return b
 }

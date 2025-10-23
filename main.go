@@ -114,23 +114,6 @@ func main() {
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func db() (Todo, error) {
-	dsn := "host=db user=postgres password=postgres dbname=go_demo port=5432 sslmode=disable TimeZone=Asia/Tokyo"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		fmt.Println(err)
-		return Todo{}, err
-	}
-
-	var todo Todo
-	if result := db.Preload("Users").First(&todo); result.Error != nil {
-		fmt.Println(result.Error)
-		return Todo{}, err
-	}
-
-	return todo, nil
-}
-
 type Todo struct {
 	ID        int `gorm:"primaryKey"`
 	UserID		int

@@ -52,7 +52,9 @@ func (idcf *IDCardFactory) createProduct(owner string) Product{
 func (idcf *IDCardFactory) registerProduct(product Product) {
 	idcf.owners = append(idcf.owners, product.getOwner())
 }
-func (idcf *IDCardFactory) getOwners() []string {
+
+// GetOwners returns the list of owners
+func (idcf *IDCardFactory) GetOwners() []string {
 	return idcf.owners
 }
 

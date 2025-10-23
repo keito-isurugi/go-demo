@@ -4,12 +4,8 @@ import  "fmt"
 
 type User struct {
 	Name string
-	age int // 外部に公開しない
 }
-func (user *User) getUserPrivate() { // 外部に公開しない
-	user.age = 12
-	fmt.Println(user.Name, user.age)
-}
+
 func (user *User) GetUserPublic() {
 	fmt.Println(user.Name)
 }

@@ -37,7 +37,9 @@ func (h *SecurityDemoHandler) CORSVulnerableHandler(w http.ResponseWriter, r *ht
 		"status":  "vulnerable",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // CORSSecureHandler - 安全なCORS設定（特定のオリジンのみ許可）
@@ -76,7 +78,9 @@ func (h *SecurityDemoHandler) CORSSecureHandler(w http.ResponseWriter, r *http.R
 		"status":  status,
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // ==================== CSRF Demo ====================
@@ -95,7 +99,9 @@ func (h *SecurityDemoHandler) CSRFTokenHandler(w http.ResponseWriter, r *http.Re
 		"expires": "10 minutes",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // CSRFVulnerableHandler - CSRF保護なしのエンドポイント
@@ -112,7 +118,9 @@ func (h *SecurityDemoHandler) CSRFVulnerableHandler(w http.ResponseWriter, r *ht
 		"action":  "Money transferred successfully",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // CSRFSecureHandler - CSRF保護ありのエンドポイント
@@ -146,7 +154,9 @@ func (h *SecurityDemoHandler) CSRFSecureHandler(w http.ResponseWriter, r *http.R
 		"action":  "Money transferred successfully",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // ==================== XSS Demo ====================
@@ -174,7 +184,9 @@ func (h *SecurityDemoHandler) XSSVulnerableHandler(w http.ResponseWriter, r *htt
 `, name)
 
 	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(html))
+	if _, err := w.Write([]byte(html)); err != nil {
+		return
+	}
 }
 
 // XSSSecureHandler - XSS対策済みのエンドポイント
@@ -203,7 +215,9 @@ func (h *SecurityDemoHandler) XSSSecureHandler(w http.ResponseWriter, r *http.Re
 `, safeName)
 
 	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(htmlContent))
+	if _, err := w.Write([]byte(htmlContent)); err != nil {
+		return
+	}
 }
 
 // ==================== SQL Injection Demo ====================
@@ -242,7 +256,9 @@ func (h *SecurityDemoHandler) SQLInjectionVulnerableHandler(w http.ResponseWrite
 	for rows.Next() {
 		var id int
 		var name, email string
-		rows.Scan(&id, &name, &email)
+		if err := rows.Scan(&id, &name, &email); err != nil {
+			continue
+		}
 		results = append(results, map[string]interface{}{
 			"id":    id,
 			"name":  name,
@@ -258,7 +274,9 @@ func (h *SecurityDemoHandler) SQLInjectionVulnerableHandler(w http.ResponseWrite
 		"warning": "Try: ?username=admin' OR '1'='1",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // SQLInjectionSecureHandler - SQLインジェクション対策済みのエンドポイント
@@ -304,7 +322,9 @@ func (h *SecurityDemoHandler) SQLInjectionSecureHandler(w http.ResponseWriter, r
 	for rows.Next() {
 		var id int
 		var name, email string
-		rows.Scan(&id, &name, &email)
+		if err := rows.Scan(&id, &name, &email); err != nil {
+			continue
+		}
 		results = append(results, map[string]interface{}{
 			"id":    id,
 			"name":  name,
@@ -319,7 +339,9 @@ func (h *SecurityDemoHandler) SQLInjectionSecureHandler(w http.ResponseWriter, r
 		"note":    "SQL injection attempts are safely escaped",
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		return
+	}
 }
 
 // SecurityInfoHandler - セキュリティデモの情報を返す
