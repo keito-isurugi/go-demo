@@ -141,7 +141,9 @@ func (h *SecurityDemoHandler) CSRFSecureHandler(w http.ResponseWriter, r *http.R
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -231,7 +233,9 @@ func (h *SecurityDemoHandler) SQLInjectionVulnerableHandler(w http.ResponseWrite
 			"example": "/api/security/sql-injection/vulnerable?username=admin",
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -248,7 +252,9 @@ func (h *SecurityDemoHandler) SQLInjectionVulnerableHandler(w http.ResponseWrite
 			"status":  "vulnerable",
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 	defer rows.Close()
@@ -288,7 +294,9 @@ func (h *SecurityDemoHandler) SQLInjectionSecureHandler(w http.ResponseWriter, r
 			"example": "/api/security/sql-injection/secure?username=admin",
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -300,7 +308,9 @@ func (h *SecurityDemoHandler) SQLInjectionSecureHandler(w http.ResponseWriter, r
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 
@@ -314,7 +324,9 @@ func (h *SecurityDemoHandler) SQLInjectionSecureHandler(w http.ResponseWriter, r
 			"status":  "secure",
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			return
+		}
 		return
 	}
 	defer rows.Close()
@@ -372,5 +384,7 @@ func (h *SecurityDemoHandler) SecurityInfoHandler(w http.ResponseWriter, r *http
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(info)
+	if err := json.NewEncoder(w).Encode(info); err != nil {
+		return
+	}
 }

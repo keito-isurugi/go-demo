@@ -44,8 +44,8 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Hello, World!!!")
-    })
+		fmt.Fprintf(w, "Hello, World!!!")
+	})
 
 	// 時関
 	http.HandleFunc("/demo/time", handler.TimeDemoHandler)
@@ -60,9 +60,9 @@ func main() {
 	// テストデータ(10,000件)を作成
 	http.HandleFunc("/demo/cache/init", cacheHandler.InitTestDataHandler)
 	// Redisキャッシュを使用してログ取得
-	http.HandleFunc("/demo/cache/with", cacheHandler.CacheWithHandler)    
+	http.HandleFunc("/demo/cache/with", cacheHandler.CacheWithHandler)
 	// キャッシュなしでDBから直接ログ取得
-	http.HandleFunc("/demo/cache/without", cacheHandler.CacheWithoutHandler) 
+	http.HandleFunc("/demo/cache/without", cacheHandler.CacheWithoutHandler)
 	// Redisキャッシュをクリア
 	http.HandleFunc("/demo/cache/clear", cacheHandler.ClearCacheHandler)
 
@@ -71,7 +71,9 @@ func main() {
 	http.Handle("/api/limited", rateLimiter.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Success! This endpoint is rate-limited to 10 requests per minute."}`))
+		if _, err := w.Write([]byte(`{"message": "Success! This endpoint is rate-limited to 10 requests per minute."}`)); err != nil {
+			return
+		}
 	})))
 
 	// セキュリティデモAPI
@@ -111,12 +113,12 @@ func main() {
 	http.HandleFunc("/api/aggregate/preset", aggregateHandler.PresetAggregateHandler)
 
 	fmt.Println("localhost:8080 server runnig ...")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 type Todo struct {
 	ID        int `gorm:"primaryKey"`
-	UserID		int
+	UserID    int
 	User      User
 	Title     string
 	DoneFlag  bool

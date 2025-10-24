@@ -78,7 +78,9 @@ func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 		if len(validTimestamps) >= rl.limit {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
-			w.Write([]byte(`{"error": "Rate limit exceeded. Maximum 10 requests per minute."}`))
+			if _, err := w.Write([]byte(`{"error": "Rate limit exceeded. Maximum 10 requests per minute."}`)); err != nil {
+				return
+			}
 			return
 		}
 
