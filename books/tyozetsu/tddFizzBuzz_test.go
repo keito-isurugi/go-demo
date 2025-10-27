@@ -1,7 +1,6 @@
 package tyozetsu
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -23,7 +22,7 @@ func TestNumberConvert(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("convart"), func(t *testing.T) {
+		t.Run("convert", func(t *testing.T) {
 			got := fizzBuzz.convert(tt.n)
 			if got != tt.want {
 				t.Errorf(got, tt.want)

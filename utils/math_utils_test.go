@@ -215,6 +215,6 @@ func BenchmarkMultiply(b *testing.B) {
 
 func BenchmarkDivide(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Divide(100, 20)
+		_, _ = Divide(100, 20)
 	}
 }

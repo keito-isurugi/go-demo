@@ -69,11 +69,35 @@ jobs:
       with:
         go-version: '1.25'
 
+    - name: Install golangci-lint
+      run: |
+        # Go 1.25環境でgolangci-lintをビルドするため、ソースからインストール
+        go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+    - name: Add Go bin to PATH
+      run: |
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: Temporarily adjust go.mod for golangci-lint compatibility
+      run: |
+        # golangci-lintがGo 1.23でビルドされているため、一時的にgo.modを調整
+        cp go.mod go.mod.original
+        sed -i 's/^go 1.25/go 1.23/' go.mod
+        sed -i '/^toolchain go1.25.0/d' go.mod
+
+    - name: Verify golangci-lint version
+      run: golangci-lint version
+
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v4
-      with:
-        version: latest
-        args: --timeout=5m
+      run: golangci-lint run --timeout=5m
+
+    - name: Restore go.mod
+      if: always()
+      run: |
+        # go.modを元に戻す
+        if [ -f go.mod.original ]; then
+          mv go.mod.original go.mod
+        fi
 
   build:
     name: Build
