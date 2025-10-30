@@ -35,11 +35,13 @@ type FastestResponseResult struct {
 
 // FetchFastestHandler は最速のレスポンスを返すハンドラ
 func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *http.Request) {
+	// リクエストメソッドがPOSTでない場合はエラーを返す
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed. Use POST.", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// リクエストボディをデコード
 	var req URLRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response := map[string]interface{}{
@@ -58,6 +60,7 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
+	// URLがない場合はエラーを返す
 	if len(req.URLs) == 0 {
 		response := map[string]interface{}{
 			"error": "No URLs provided",
@@ -80,8 +83,11 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 
 	// 最速のレスポンスを取得
 	result := h.fetchURLsParallel(req.URLs, timeout)
+
+	// トータルの所要時間を設定
 	result.TotalDuration = time.Since(startTime).Milliseconds()
 
+	// レスポンスを返す
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		return
@@ -90,6 +96,7 @@ func (h *ParallelFetchHandler) FetchFastestHandler(w http.ResponseWriter, r *htt
 
 // fetchURLsParallel は複数のURLを並列で取得し、最速のレスポンスを返す
 func (h *ParallelFetchHandler) fetchURLsParallel(urls []string, timeoutSec int) FastestResponseResult {
+	// コンテキストを作成
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
 	defer cancel()
 
