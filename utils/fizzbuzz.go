@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -13,7 +12,7 @@ const (
 
 func FizzBuzz(input int) (string, error) {
 	if input < min || input > max {
-		return "", errors.New(fmt.Sprintf("input is not between %d and %d", min, max))
+		return "", fmt.Errorf("input is not between %d and %d", min, max)
 	}
 	
 	if input % 15 == 0 {
