@@ -6,6 +6,7 @@ import (
 
 	"github.com/keito-isurugi/go-demo/books"
 	"github.com/keito-isurugi/go-demo/handler"
+	"github.com/keito-isurugi/go-demo/handler/bank"
 	"github.com/keito-isurugi/go-demo/middleware"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
@@ -111,6 +112,27 @@ func main() {
 	http.HandleFunc("/api/aggregate", aggregateHandler.AggregateHandler)
 	// プリセットAPIを並列実行して集約（デモ用）
 	http.HandleFunc("/api/aggregate/preset", aggregateHandler.PresetAggregateHandler)
+
+	// 銀行振込API
+	bankTransferHandler := &bank.Handler{DB: dbConn}
+	// テスト用口座を初期化
+	http.HandleFunc("/api/bank/init", bankTransferHandler.InitAccountsHandler)
+	// 通常の振込処理
+	http.HandleFunc("/api/bank/transfer", bankTransferHandler.NormalTransferHandler)
+	// 口座情報を取得
+	http.HandleFunc("/api/bank/account", bankTransferHandler.GetAccountHandler)
+	// 全口座一覧を取得
+	http.HandleFunc("/api/bank/accounts", bankTransferHandler.ListAccountsHandler)
+	// Dirty Readデモ
+	http.HandleFunc("/api/bank/dirty-read", bankTransferHandler.DirtyReadDemoHandler)
+	// Phantom Readデモ
+	http.HandleFunc("/api/bank/phantom-read", bankTransferHandler.PhantomReadDemoHandler)
+	// デッドロックデモ
+	http.HandleFunc("/api/bank/deadlock", bankTransferHandler.DeadlockDemoHandler)
+	// デッドロック回避策1: ロック順序の統一
+	http.HandleFunc("/api/bank/transfer-safe", bankTransferHandler.DeadlockAvoidanceHandler)
+	// デッドロック回避策2: タイムアウト設定
+	http.HandleFunc("/api/bank/transfer-timeout", bankTransferHandler.DeadlockTimeoutHandler)
 
 	fmt.Println("localhost:8080 server runnig ...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
