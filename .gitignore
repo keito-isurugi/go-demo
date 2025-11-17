@@ -2,3 +2,10 @@ persist
 .env
 tmp
 .main
+*.prof
+*.pprof
+trace.out
+*.trace
+.DS_Store
+.idea
+.vscode
