@@ -170,8 +170,16 @@ func main() {
 	// DemoTwoPointers()
 
 	// エラトステネスの篩のデモ
-	fmt.Println("\n--- エラトステネスの篩のデモ ---")
-	DemoSieveOfEratosthenes()
+	// fmt.Println("\n--- エラトステネスの篩のデモ ---")
+	// DemoSieveOfEratosthenes()
+
+	// スタックのデモ
+	// fmt.Println("\n--- スタックのデモ ---")
+	// DemoStack()
+
+	// キューのデモ
+	fmt.Println("\n--- キューのデモ ---")
+	DemoQueue()
 }
 
 // RunGCDDemo は最大公約数（ユークリッドの互除法）のデモを実行
