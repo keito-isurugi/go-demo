@@ -1,5 +1,5 @@
 ---
-description: アルゴリズムのサンプルコードと記事を作成。使い方： /create-algorithm-article <アルゴリズム名>
+description: データ構造とアルゴリズムのサンプルコードと記事を作成。使い方： /create-algorithm-article <アルゴリズム名>
 ---
 
 {{prompt}}のサンプルコードを/demo/algorithmに作成して、{{prompt}}に関する記事を書いてください。
