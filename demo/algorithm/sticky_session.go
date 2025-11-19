@@ -318,7 +318,7 @@ func (lb *SessionReplicationLoadBalancer) GetSessionData(sessionID, key string) 
 func DemoStickySession() {
 	fmt.Println("==============================================")
 	fmt.Println("Sticky Sessionの実装と比較")
-	fmt.Println("==============================================\n")
+	fmt.Println("==============================================")
 
 	// サーバーの準備
 	servers := []*Server{
@@ -515,7 +515,7 @@ func resetServerLoad(servers []*Server) {
 func DemoStickySessionPerformance() {
 	fmt.Println("\n==============================================")
 	fmt.Println("パフォーマンス比較")
-	fmt.Println("==============================================\n")
+	fmt.Println("==============================================")
 
 	servers := []*Server{
 		NewServer("s1", "Server-1"),

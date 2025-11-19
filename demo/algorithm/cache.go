@@ -447,7 +447,7 @@ func (c *WriteBackCache) GetDirtyCount() int {
 func DemoCacheAlgorithms() {
 	fmt.Println("==============================================")
 	fmt.Println("キャッシュアルゴリズムの比較")
-	fmt.Println("==============================================\n")
+	fmt.Println("==============================================")
 
 	demoLRU()
 	fmt.Println()
