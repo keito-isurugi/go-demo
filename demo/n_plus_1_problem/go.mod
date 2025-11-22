@@ -1,6 +1,6 @@
 module n_plus_1_problem
 
-go 1.23
+go 1.25
 
 require (
 	gorm.io/driver/sqlite v1.5.7
