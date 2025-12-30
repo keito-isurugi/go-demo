@@ -66,49 +66,25 @@ domain/
   email_test.go
 ```
 
-### 実装例（Money）
+### 実装のヒント（Money）
 ```go
 package domain
 
-import "errors"
+// Money 値オブジェクト
+// - 金額(amount)と通貨(currency)をフィールドに持つ
+// - フィールドは非公開にして不変性を保つ
 
-type Currency string
+// Currency 通貨を表す型
+// - JPY, USD などの定数を定義
 
-const (
-    JPY Currency = "JPY"
-    USD Currency = "USD"
-)
+// NewMoney コンストラクタ
+// - 負の金額はエラーを返す
 
-type Money struct {
-    amount   int
-    currency Currency
-}
+// Add 加算メソッド
+// - 異なる通貨同士の計算はエラーを返す
 
-func NewMoney(amount int, currency Currency) (Money, error) {
-    if amount < 0 {
-        return Money{}, errors.New("amount must be non-negative")
-    }
-    return Money{amount: amount, currency: currency}, nil
-}
-
-func (m Money) Add(other Money) (Money, error) {
-    if m.currency != other.currency {
-        return Money{}, errors.New("currency mismatch")
-    }
-    return NewMoney(m.amount+other.amount, m.currency)
-}
-
-func (m Money) Amount() int {
-    return m.amount
-}
-
-func (m Money) Currency() Currency {
-    return m.currency
-}
-
-func (m Money) Equals(other Money) bool {
-    return m.amount == other.amount && m.currency == other.currency
-}
+// Equals 等価性の比較
+// - 金額と通貨が両方一致すれば等しい
 ```
 
 ---
@@ -245,26 +221,13 @@ domain/
 ### 課題内容
 
 1. **リポジトリインターフェースの定義（ドメイン層）**
-
-```go
-// domain/repository/order_repository.go
-package repository
-
-import "context"
-
-type OrderRepository interface {
-    Save(ctx context.Context, order *Order) error
-    FindByID(ctx context.Context, id OrderID) (*Order, error)
-    FindByCustomerID(ctx context.Context, customerID CustomerID) ([]*Order, error)
-    Delete(ctx context.Context, id OrderID) error
-}
-```
+   - `OrderRepository` インターフェースを定義
+   - CRUD操作のメソッドを持つ（Save, FindByID, FindByCustomerID, Delete）
+   - contextを第一引数に取る
 
 2. **リポジトリ実装（インフラストラクチャ層）**
-
-```go
-// infrastructure/persistence/order_repository_impl.go
-```
+   - インターフェースを実装する構造体を作成
+   - データベース接続を依存として受け取る
 
 ### 実装場所
 ```
@@ -317,35 +280,21 @@ application/
   order_event_handler.go
 ```
 
-### 実装例
+### 実装のヒント
 ```go
 // domain/event.go
 package domain
 
-import "time"
-
-type DomainEvent interface {
-    OccurredAt() time.Time
-    AggregateID() string
-    EventType() string
-}
+// DomainEvent インターフェース
+// - OccurredAt() time.Time  // イベント発生日時
+// - AggregateID() string    // 集約のID
+// - EventType() string      // イベントの種類
 
 // domain/order_confirmed.go
-type OrderConfirmed struct {
-    orderID    string
-    customerID string
-    totalAmount int
-    occurredAt time.Time
-}
-
-func NewOrderConfirmed(orderID, customerID string, totalAmount int) OrderConfirmed {
-    return OrderConfirmed{
-        orderID:     orderID,
-        customerID:  customerID,
-        totalAmount: totalAmount,
-        occurredAt:  time.Now(),
-    }
-}
+// OrderConfirmed 構造体
+// - orderID, customerID, totalAmount, occurredAt をフィールドに持つ
+// - NewOrderConfirmed コンストラクタで生成
+// - DomainEvent インターフェースを実装
 ```
 
 ---
@@ -383,60 +332,29 @@ application/
   process_payment_test.go
 ```
 
-### 実装例
+### 実装のヒント
 ```go
 // application/confirm_order.go
 package application
 
-type ConfirmOrderUseCase struct {
-    orderRepo      domain.OrderRepository
-    stockService   domain.StockAllocationService
-    eventPublisher domain.Publisher
-}
+// ConfirmOrderUseCase ユースケース構造体
+// 依存として以下を持つ:
+// - OrderRepository（注文の永続化）
+// - StockAllocationService（在庫引当）
+// - Publisher（イベント発行）
 
-type ConfirmOrderInput struct {
-    OrderID string
-}
+// ConfirmOrderInput 入力DTO
+// - OrderID を持つ
 
-type ConfirmOrderOutput struct {
-    Success bool
-    Message string
-}
+// ConfirmOrderOutput 出力DTO
+// - Success, Message を持つ
 
-func (uc *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInput) (*ConfirmOrderOutput, error) {
-    // 1. 注文を取得
-    order, err := uc.orderRepo.FindByID(ctx, OrderID(input.OrderID))
-    if err != nil {
-        return nil, err
-    }
-
-    // 2. 在庫を引き当て
-    err = uc.stockService.Allocate(ctx, order)
-    if err != nil {
-        return nil, err
-    }
-
-    // 3. 注文を確定
-    err = order.Confirm()
-    if err != nil {
-        return nil, err
-    }
-
-    // 4. 永続化
-    err = uc.orderRepo.Save(ctx, order)
-    if err != nil {
-        return nil, err
-    }
-
-    // 5. ドメインイベント発行
-    uc.eventPublisher.Publish(domain.NewOrderConfirmed(
-        order.ID().String(),
-        order.CustomerID().String(),
-        order.TotalAmount().Amount(),
-    ))
-
-    return &ConfirmOrderOutput{Success: true, Message: "Order confirmed"}, nil
-}
+// Execute メソッドの処理フロー:
+// 1. 注文を取得
+// 2. 在庫を引き当て
+// 3. 注文を確定（ドメインのメソッド呼び出し）
+// 4. 永続化
+// 5. ドメインイベント発行
 ```
 
 ---
