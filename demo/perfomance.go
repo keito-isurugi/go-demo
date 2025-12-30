@@ -20,6 +20,7 @@ func PerformanceDemo() {
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("append: %v\n", elapsed)
+	_ = slice // use the result
 
 	// スライスをリセット
 	slice = make([]int, size)
@@ -57,6 +58,7 @@ func PerformanceProfDemo() {
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("append: %v\n", elapsed)
+	_ = slice // use the result
 
 	// スライスをリセット
 	slice = make([]int, size)
@@ -97,6 +99,7 @@ func PerformanceTraceDemo() {
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("append: %v\n", elapsed)
+	_ = slice // use the result
 
 	// スライスをリセット
 	slice = make([]int, size)

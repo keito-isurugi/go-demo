@@ -8,15 +8,15 @@ import (
 
 func PerformanceHandler(w http.ResponseWriter, r *http.Request) {
 	demo.PerformanceDemo()
-	w.Write([]byte("performance comparison!"))
-} 
+	_, _ = w.Write([]byte("performance comparison!"))
+}
 
 func PerformanceProfHandler(w http.ResponseWriter, r *http.Request) {
 	demo.PerformanceProfDemo()
-	w.Write([]byte("performance comparison!"))
-} 
+	_, _ = w.Write([]byte("performance comparison!"))
+}
 
 func PerformanceTraceHandler(w http.ResponseWriter, r *http.Request) {
 	demo.PerformanceTraceDemo()
-	w.Write([]byte("performance comparison!"))
+	_, _ = w.Write([]byte("performance comparison!"))
 } 

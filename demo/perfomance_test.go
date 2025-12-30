@@ -14,6 +14,7 @@ func BenchmarkAppend(b *testing.B) {
         for j := 0; j < size; j++ {
             slice = append(slice, j)
         }
+        _ = slice
     }
 }
 
