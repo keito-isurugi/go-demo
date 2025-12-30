@@ -58,18 +58,17 @@ ECサイトの「注文管理システム」を題材に、DDDの各概念を段
 ### 実装場所
 ```
 domain/
-  valueobject/
-    money.go
-    money_test.go
-    quantity.go
-    quantity_test.go
-    email.go
-    email_test.go
+  money.go
+  money_test.go
+  quantity.go
+  quantity_test.go
+  email.go
+  email_test.go
 ```
 
 ### 実装例（Money）
 ```go
-package valueobject
+package domain
 
 import "errors"
 
@@ -137,10 +136,9 @@ func (m Money) Equals(other Money) bool {
 ### 実装場所
 ```
 domain/
-  entity/
-    order.go
-    order_test.go
-    order_line.go
+  order.go
+  order_test.go
+  order_line.go
 ```
 
 ### ポイント
@@ -174,11 +172,12 @@ domain/
 ### 実装場所
 ```
 domain/
-  aggregate/
-    order/
-      order.go
-      order_test.go
+  order/
+    order.go
+    order_test.go
 ```
+
+※ 集約は機能ドメイン単位でディレクトリを切る（技術的分類ではなく）
 
 ### 設計図
 ```
@@ -226,11 +225,10 @@ domain/
 ### 実装場所
 ```
 domain/
-  service/
-    stock_allocation_service.go
-    stock_allocation_service_test.go
-    discount_service.go
-    discount_service_test.go
+  stock_allocation_service.go
+  stock_allocation_service_test.go
+  discount_service.go
+  discount_service_test.go
 ```
 
 ### ポイント
@@ -271,13 +269,12 @@ type OrderRepository interface {
 ### 実装場所
 ```
 domain/
-  repository/
-    order_repository.go
+  order_repository.go
 
 infrastructure/
   persistence/
-    order_repository_impl.go
-    order_repository_impl_test.go
+    order_repository.go
+    order_repository_test.go
 ```
 
 ### ポイント
@@ -311,21 +308,19 @@ infrastructure/
 ### 実装場所
 ```
 domain/
-  event/
-    domain_event.go
-    order_confirmed.go
-    payment_completed.go
-    stock_depleted.go
+  event.go
+  order_confirmed.go
+  payment_completed.go
+  stock_depleted.go
 
 application/
-  eventhandler/
-    order_event_handler.go
+  order_event_handler.go
 ```
 
 ### 実装例
 ```go
-// domain/event/domain_event.go
-package event
+// domain/event.go
+package domain
 
 import "time"
 
@@ -335,7 +330,7 @@ type DomainEvent interface {
     EventType() string
 }
 
-// domain/event/order_confirmed.go
+// domain/order_confirmed.go
 type OrderConfirmed struct {
     orderID    string
     customerID string
@@ -380,24 +375,23 @@ func NewOrderConfirmed(orderID, customerID string, totalAmount int) OrderConfirm
 ### 実装場所
 ```
 application/
-  usecase/
-    create_order_usecase.go
-    create_order_usecase_test.go
-    confirm_order_usecase.go
-    confirm_order_usecase_test.go
-    process_payment_usecase.go
-    process_payment_usecase_test.go
+  create_order.go
+  create_order_test.go
+  confirm_order.go
+  confirm_order_test.go
+  process_payment.go
+  process_payment_test.go
 ```
 
 ### 実装例
 ```go
-// application/usecase/confirm_order_usecase.go
-package usecase
+// application/confirm_order.go
+package application
 
 type ConfirmOrderUseCase struct {
-    orderRepo      repository.OrderRepository
-    stockService   service.StockAllocationService
-    eventPublisher event.Publisher
+    orderRepo      domain.OrderRepository
+    stockService   domain.StockAllocationService
+    eventPublisher domain.Publisher
 }
 
 type ConfirmOrderInput struct {
@@ -435,7 +429,7 @@ func (uc *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderIn
     }
 
     // 5. ドメインイベント発行
-    uc.eventPublisher.Publish(event.NewOrderConfirmed(
+    uc.eventPublisher.Publish(domain.NewOrderConfirmed(
         order.ID().String(),
         order.CustomerID().String(),
         order.TotalAmount().Amount(),
@@ -525,18 +519,25 @@ demo/ddd/
 │   └── server/
 │       └── main.go
 ├── domain/
-│   ├── aggregate/
-│   │   └── order/
-│   ├── entity/
-│   ├── valueobject/
-│   ├── service/
-│   ├── repository/
-│   └── event/
+│   ├── order/           # 注文集約（集約ルート + 関連エンティティ）
+│   │   ├── order.go
+│   │   ├── order_line.go
+│   │   └── order_test.go
+│   ├── money.go          # 値オブジェクト
+│   ├── quantity.go
+│   ├── email.go
+│   ├── event.go          # ドメインイベントインターフェース
+│   ├── order_confirmed.go
+│   ├── order_repository.go  # リポジトリインターフェース
+│   └── stock_allocation_service.go  # ドメインサービス
 ├── application/
-│   ├── usecase/
-│   └── eventhandler/
+│   ├── create_order.go
+│   ├── confirm_order.go
+│   ├── process_payment.go
+│   └── order_event_handler.go
 ├── infrastructure/
 │   ├── persistence/
+│   │   └── order_repository.go  # リポジトリ実装
 │   └── external/
 ├── interfaces/
 │   └── api/
@@ -545,6 +546,12 @@ demo/ddd/
 │   └── ubiquitous_language.md
 └── go.mod
 ```
+
+### ディレクトリ構成のポイント
+- **技術的分類（valueobject, entity, service等）でディレクトリを切らない**
+- **機能ドメイン単位（order等）でディレクトリを切る**
+- domainパッケージはフラットに保ち、インポートパスをシンプルに
+- 集約が大きくなった場合のみサブディレクトリを検討
 
 ---
 
