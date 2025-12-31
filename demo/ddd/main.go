@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	_ "ddd/domain"
+)
 
 func main() {
 	fmt.Println("DDD")
