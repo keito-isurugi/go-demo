@@ -70,7 +70,7 @@ func (o *Order) RemoveLine(productID ProductID) error {
 	return errors.New("order line not found")
 }
 
-func (o *Order) Confirmed() error {
+func (o *Order) Confirm() error {
 	if o.status != Draft {
 		return errors.New("can only confirm draft orders")
 	}

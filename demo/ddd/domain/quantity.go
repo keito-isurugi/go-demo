@@ -14,12 +14,16 @@ func NewQuantity(value int) (Quantity, error) {
 	return Quantity{value: value}, nil
 }
 
-func (q Quantity) Add(value int) (Quantity, error) {
-	return NewQuantity(q.value + value)
+func (q Quantity) Add(other Quantity) (Quantity, error) {
+	return NewQuantity(q.value + other.value)
 }
 
-func (q Quantity) Subtract(value int) (Quantity, error) {
-	return NewQuantity(q.value - value)
+func (q Quantity) Subtract(other Quantity) (Quantity, error) {
+	return NewQuantity(q.value - other.value)
+}
+
+func (q Quantity) Multiply(multiplier int) (Quantity, error) {
+	return NewQuantity(q.value * multiplier)
 }
 
 func (q Quantity) IsZero() bool {

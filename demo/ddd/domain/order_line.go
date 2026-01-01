@@ -2,7 +2,6 @@ package domain
 
 import "errors"
 
-type ProductID string
 type ProductName string
 
 type OrderLine struct {
