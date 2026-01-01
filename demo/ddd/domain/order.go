@@ -15,6 +15,8 @@ const (
 	Cancelled OrderStatus = "Cancelled"
 )
 
+const MaxOrderAmount = 1000000
+
 type Order struct {
 	id OrderID
 	customerID CustomerID
@@ -42,6 +44,11 @@ func NewOrder(id OrderID, customerID CustomerID, lines []OrderLine, status Order
 func (o *Order) AddLine(line OrderLine) error {
 	if o.status != Draft {
 		return errors.New("can only add lines to draft orders")
+	}
+
+	newTotal := o.Total() + line.Subtotal()
+	if newTotal > MaxOrderAmount {
+		return errors.New("order total exceeds maximum allowed amount")
 	}
 
 	o.lines = append(o.lines, line)
