@@ -10,17 +10,17 @@ const (
 )
 
 type Money struct {
-	ammount int
+	amount int
 	currensy Currensy
 }
 
-func NewMoney(ammount int, currensy Currensy) (Money, error) {
-	if ammount < 0 {
-		return Money{}, errors.New("ammount must be non-negative")
+func NewMoney(amount int, currensy Currensy) (Money, error) {
+	if amount < 0 {
+		return Money{}, errors.New("amount must be non-negative")
 	}
 
 	return Money{
-		ammount: ammount,
+		amount: amount,
 		currensy: currensy,
 	}, nil
 }
@@ -30,11 +30,11 @@ func (m Money) Add(other Money) (Money, error) {
 		return Money{}, errors.New("currensy mismatch")
 	}
 
-	return NewMoney(other.ammount, other.currensy)
+	return NewMoney(other.amount, other.currensy)
 }
 
-func (m Money) Ammount() int {
-	return m.ammount
+func (m Money) Amount() int {
+	return m.amount
 }
 
 func (m Money) Currensy() Currensy {
@@ -42,5 +42,5 @@ func (m Money) Currensy() Currensy {
 }
 
 func (m Money) Equals(other Money) bool {
-	return m.ammount == other.ammount && m.currensy == other.currensy
+	return m.amount == other.amount && m.currensy == other.currensy
 }
