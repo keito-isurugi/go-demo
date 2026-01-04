@@ -42,17 +42,47 @@ func NewOrder(id OrderID, customerID CustomerID, lines []OrderLine, status Order
 }
 
 func (o *Order) AddLine(line OrderLine) error {
-	if o.status != Draft {
-		return errors.New("can only add lines to draft orders")
-	}
+    if o.status != Draft {
+        return errors.New("can only add lines to draft orders")
+    }
 
-	newTotal := o.Total() + line.Subtotal()
-	if newTotal > MaxOrderAmount {
-		return errors.New("order total exceeds maximum allowed amount")
-	}
+    // 重複商品チェック
+    for _, existingLine := range o.lines {
+        if existingLine.ProductID() == line.ProductID() {
+            return errors.New("product already exists in order")
+        }
+    }
 
-	o.lines = append(o.lines, line)
-	return nil
+    // 現在の合計を取得
+    currentTotal, err := o.Total()
+    if err != nil {
+        return err
+    }
+
+    // 新しい明細の小計を取得
+    lineSubtotal, err := line.Subtotal()
+    if err != nil {
+        return err
+    }
+
+    // 新しい合計を計算
+    newTotal, err := currentTotal.Add(lineSubtotal)
+    if err != nil {
+        return err
+    }
+
+    // 上限チェック（100万円）
+    maxAmount, _ := NewMoney(MaxOrderAmount, JPY)
+    isGreater, err := newTotal.IsGreaterThan(maxAmount)
+    if err != nil {
+        return err
+    }
+    if isGreater {
+        return errors.New("order total exceeds maximum allowed amount")
+    }
+
+    o.lines = append(o.lines, line)
+    return nil
 }
 
 func (o *Order) RemoveLine(productID ProductID) error {
@@ -107,12 +137,31 @@ func (o *Order) Cancel() error {
     return nil
 }
 
-func (o Order) Total() int {
-	var res int
-	for _, l := range o.lines {
-		res += l.Subtotal()
-	}
-	return res
+func (o Order) Total() (Money, error) {
+	if len(o.lines) == 0 {
+        // デフォルト通貨でゼロを返す（または適切な通貨を決定）
+        return NewMoney(0, JPY)
+    }
+    
+    // 最初の明細の通貨を基準とする
+    firstSubtotal, err := o.lines[0].Subtotal()
+    if err != nil {
+        return Money{}, err
+    }
+    
+    total := firstSubtotal
+    for i := 1; i < len(o.lines); i++ {
+        subtotal, err := o.lines[i].Subtotal()
+        if err != nil {
+            return Money{}, err
+        }
+        total, err = total.Add(subtotal)
+        if err != nil {
+            return Money{}, err
+        }
+    }
+
+    return total, nil
 }
 
 func (o Order) ID() OrderID {

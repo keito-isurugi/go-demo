@@ -28,8 +28,9 @@ func NewOrderLine(id ProductID, productName ProductName, money Money, quantity Q
 	}, nil
 }
 
-func (ol OrderLine) Subtotal() int {
-	return ol.price.Amount() * ol.quantity.Value()
+func (ol OrderLine) Subtotal() (Money, error) {
+	amount := ol.price.Amount() * ol.quantity.Value()
+	return NewMoney(amount, ol.price.currency)
 }
 
 func (ol OrderLine) ProductID() ProductID {
