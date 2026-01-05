@@ -285,7 +285,7 @@ Cancelled Cancelled   ✗
 1. **集約の境界を決める**
    - Order（集約ルート）
    - OrderLine（集約内エンティティ、または値オブジェクト）
-   - **重要**: CustomerやProductは別の集約なので、IDで参照する（オブジェクト参照しない）
+   - CustomerやProductは別の集約なので、IDで参照する（オブジェクト参照しない）
 
 2. **集約ルート経由のアクセス**
    - OrderLineへの操作はすべてOrder経由で行う
@@ -307,57 +307,32 @@ Cancelled Cancelled   ✗
    - 注文の合計金額が上限を超えないこと（例: 100万円）
    - 注文明細が0件の注文は確定できないこと
    - **同じ商品の重複注文明細を許可しない**（同じProductIDのOrderLineは1つのみ）
-     ```go
-     func (o *Order) AddLine(line OrderLine) error {
-         if o.status != Draft {
-             return errors.New("can only add lines to draft orders")
-         }
-
-         // 重複チェック（重要な不変条件）
-         for _, existingLine := range o.lines {
-             if existingLine.ProductID() == line.ProductID() {
-                 return errors.New("product already exists in order")
-             }
-         }
-
-         // 合計金額の上限チェック
-         newTotal, err := o.calculateTotalWithNewLine(line)
-         if err != nil {
-             return err
-         }
-
-         // Money型を使った比較
-         maxAmount, _ := NewMoney(1000000, JPY)
-         if newTotal.IsGreaterThan(maxAmount) {
-             return errors.New("order total exceeds maximum allowed amount")
-         }
-
-         o.lines = append(o.lines, line)
-         return nil
-     }
-     ```
    - Draft状態でのみ明細の追加・削除を許可する
 
-   **不変条件を守るテストケース:**
-   ```go
-   func TestOrder_AddLine_DuplicateProduct_Error(t *testing.T) {
-       // 同じProductIDの明細を2回追加しようとするとエラーになることを確認
-   }
+### AddLineメソッド実装のヒント
+```go
+func (o *Order) AddLine(line OrderLine) error {
+    // 1. ステータスがDraftかチェック
+    //    - Draft以外ならエラーを返す
 
-   func TestOrder_AddLine_ExceedMaxAmount_Error(t *testing.T) {
-       // 合計金額が100万円を超える明細を追加しようとするとエラーになることを確認
-   }
+    // 2. 重複チェック（重要な不変条件）
+    //    - o.linesをループして、同じProductIDが存在しないかチェック
+    //    - 既に存在すればエラーを返す
 
-   func TestOrder_AddLine_NotDraftStatus_Error(t *testing.T) {
-       // Confirmed状態の注文に明細を追加しようとするとエラーになることを確認
-   }
-   ```
+    // 3. 合計金額の上限チェック
+    //    - 新しい明細を追加した場合の合計金額を計算
+    //    - Money型を使って上限（例: 100万円）と比較
+    //    - 上限を超えていればエラーを返す
+
+    // 4. 明細を追加
+    //    - o.linesにlineを追加
+    //    - nilを返す
+}
+```
 
    **重要**: 不変条件は集約ルート（Order）のメソッド内で必ずチェックし、違反する操作は拒否してください。
 
 #### 4-2. 在庫集約（Stock Aggregate）
-
-**重要**: この課題を始める前に、Stockエンティティを実装してください。課題5（ドメインサービス）で使用します。
 
 1. **Stockエンティティの実装**
    - ProductID（商品ID）を識別子として持つ
@@ -383,157 +358,30 @@ domain/
 
 ### Stockエンティティ実装のヒント
 ```go
-package domain
-
 // Stock 在庫エンティティ（Stock集約のルート）
-type Stock struct {
-    productID ProductID
-    available Quantity  // 利用可能在庫数
-    reserved  Quantity  // 引当済み在庫数
-}
+    // 商品ID
+    // 利用可能在庫数
+    // 引当済み在庫数
 
 // NewStock コンストラクタ
-func NewStock(productID ProductID, available Quantity) (*Stock, error) {
-    if productID == "" {
-        return nil, errors.New("product ID cannot be empty")
-    }
-    reserved, _ := NewQuantity(0)
-    return &Stock{
-        productID: productID,
-        available: available,
-        reserved:  reserved,
-    }, nil
-}
 
 // Reserve 在庫を引き当てる
 // - 利用可能在庫から引当済みに移動
 // - 在庫不足の場合はエラーを返す
-func (s *Stock) Reserve(quantity Quantity) error {
-    if !s.CanReserve(quantity) {
-        return errors.New("insufficient stock")
-    }
-
     // 利用可能在庫を減らし、引当済みを増やす
-    s.available, _ = s.available.Subtract(quantity)
-    s.reserved, _ = s.reserved.Add(quantity)
-    return nil
-}
 
 // Release 引当を解放する
 // - 引当済みから利用可能在庫に戻す
-func (s *Stock) Release(quantity Quantity) error {
     // 引当済み在庫が十分あるかチェック
-    if s.reserved.Value() < quantity.Value() {
-        return errors.New("cannot release more than reserved")
-    }
-
-    s.reserved, _ = s.reserved.Subtract(quantity)
-    s.available, _ = s.available.Add(quantity)
-    return nil
-}
 
 // CanReserve 引当可能かチェック
-func (s Stock) CanReserve(quantity Quantity) bool {
-    return s.available.Value() >= quantity.Value()
-}
 
 // ProductID ゲッター
-func (s Stock) ProductID() ProductID {
-    return s.productID
-}
 
 // Available ゲッター
-func (s Stock) Available() Quantity {
-    return s.available
-}
 
 // Reserved ゲッター
-func (s Stock) Reserved() Quantity {
-    return s.reserved
-}
 ```
-
-### Stockエンティティのテストケース例
-
-```go
-// stock_test.go
-package domain_test
-
-import (
-    "testing"
-    "yourproject/domain"
-)
-
-func TestStock_Reserve_Success(t *testing.T) {
-    // 利用可能在庫100、10個を引き当て
-    available, _ := domain.NewQuantity(100)
-    stock, _ := domain.NewStock("PROD-001", available)
-    reserveQty, _ := domain.NewQuantity(10)
-
-    err := stock.Reserve(reserveQty)
-
-    if err != nil {
-        t.Errorf("expected no error, got %v", err)
-    }
-    if stock.Available().Value() != 90 {
-        t.Errorf("expected available 90, got %d", stock.Available().Value())
-    }
-    if stock.Reserved().Value() != 10 {
-        t.Errorf("expected reserved 10, got %d", stock.Reserved().Value())
-    }
-}
-
-func TestStock_Reserve_InsufficientStock_Error(t *testing.T) {
-    // 利用可能在庫10、20個を引き当てようとする
-    available, _ := domain.NewQuantity(10)
-    stock, _ := domain.NewStock("PROD-001", available)
-    reserveQty, _ := domain.NewQuantity(20)
-
-    err := stock.Reserve(reserveQty)
-
-    if err == nil {
-        t.Error("expected error for insufficient stock")
-    }
-}
-
-func TestStock_Release_Success(t *testing.T) {
-    // 引当済み10個を解放
-    available, _ := domain.NewQuantity(90)
-    stock, _ := domain.NewStock("PROD-001", available)
-    reserveQty, _ := domain.NewQuantity(10)
-    stock.Reserve(reserveQty)
-
-    releaseQty, _ := domain.NewQuantity(10)
-    err := stock.Release(releaseQty)
-
-    if err != nil {
-        t.Errorf("expected no error, got %v", err)
-    }
-    if stock.Available().Value() != 100 {
-        t.Errorf("expected available 100, got %d", stock.Available().Value())
-    }
-    if stock.Reserved().Value() != 0 {
-        t.Errorf("expected reserved 0, got %d", stock.Reserved().Value())
-    }
-}
-
-func TestStock_CanReserve(t *testing.T) {
-    available, _ := domain.NewQuantity(100)
-    stock, _ := domain.NewStock("PROD-001", available)
-
-    qty1, _ := domain.NewQuantity(50)
-    if !stock.CanReserve(qty1) {
-        t.Error("expected to be able to reserve 50")
-    }
-
-    qty2, _ := domain.NewQuantity(150)
-    if stock.CanReserve(qty2) {
-        t.Error("expected not to be able to reserve 150")
-    }
-}
-```
-
-**必ず実装してテストしてください**: 課題5（ドメインサービス）でStockエンティティを使用します。
 
 ### 設計図
 ```
@@ -623,9 +471,7 @@ package domain
 
 // StockAllocationService 在庫引当サービス
 // 複数の集約（OrderとStock）をまたがるロジックを担当
-type StockAllocationService struct {
     // ステートレス（状態を持たない）
-}
 
 // AllocationResult 引当結果
 type AllocationResult struct {
@@ -642,10 +488,6 @@ type AllocationResult struct {
 // 戻り値:
 //   - AllocationResult: 引当結果
 //   - error: エラー
-func (s *StockAllocationService) Allocate(
-    order Order,
-    stocks map[ProductID]*Stock,
-) (AllocationResult, error) {
     // 1. 注文の各明細行をループ
     // 2. 各商品について:
     //    a. Stockエンティティが存在するか確認
@@ -658,136 +500,51 @@ func (s *StockAllocationService) Allocate(
 
     // 注意: エラーが発生した場合の補償トランザクション（引当済みを戻す）は
     // アプリケーション層のトランザクション管理で対応
-}
 
-// 実装例:
+// Allocateメソッドのシグネチャ:
 func (s *StockAllocationService) Allocate(
     order Order,
     stocks map[ProductID]*Stock,
-) (AllocationResult, error) {
-    result := AllocationResult{
-        Success: true,
-        AllocatedItems: []AllocatedItem{},
-        FailedItems: []ProductID{},
-    }
+) (AllocationResult, error)
 
-    for _, line := range order.Lines() {
-        productID := line.ProductID()
-        quantity := line.Quantity()
-
-        stock, exists := stocks[productID]
-        if !exists {
-            result.Success = false
-            result.FailedItems = append(result.FailedItems, productID)
-            continue
-        }
-
-        if !stock.CanReserve(quantity) {
-            result.Success = false
-            result.FailedItems = append(result.FailedItems, productID)
-            continue
-        }
-
-        if err := stock.Reserve(quantity); err != nil {
-            result.Success = false
-            result.FailedItems = append(result.FailedItems, productID)
-            continue
-        }
-
-        result.AllocatedItems = append(result.AllocatedItems, AllocatedItem{
-            ProductID: productID,
-            Quantity:  quantity,
-        })
-    }
-
-    if result.Success {
-        result.Message = "すべての商品の在庫引当に成功しました"
-    } else {
-        result.Message = fmt.Sprintf("一部の商品の在庫が不足しています: %v", result.FailedItems)
-    }
-
-    return result, nil
-}
+// 実装のポイント:
+// - AllocationResultを初期化（Success: trueで開始）
+// - order.Lines()をループして各明細を処理
+// - stocksマップから在庫を取得し、存在チェック
+// - CanReserve()で引当可能かチェック
+// - Reserve()で実際に引当を実行
+// - 成功/失敗に応じてAllocatedItems/FailedItemsに追加
+// - すべて成功した場合のみSuccess=true
+// - 適切なメッセージを設定
 ```
 
-### StockAllocationServiceのテストケース例
+### StockAllocationServiceのテストケース
+
+以下のテストケースを実装してください：
+
+1. **TestStockAllocationService_Allocate_AllSuccess**
+   - 複数商品の注文に対して、すべて十分な在庫がある場合
+   - 検証項目:
+     - エラーが発生しないこと
+     - result.Successがtrueであること
+     - FailedItemsが空であること
+     - **Stockエンティティの状態が正しく変更されていること**（Available減少、Reserved増加）
+
+2. **TestStockAllocationService_Allocate_PartialFailure**
+   - 一部の商品が在庫不足の場合
+   - 検証項目:
+     - result.Successがfalseであること
+     - FailedItemsに在庫不足の商品IDが含まれること
+
+3. **TestStockAllocationService_Allocate_StockNotFound**
+   - stocksマップに存在しない商品がある場合
+   - 検証項目:
+     - 該当商品がFailedItemsに含まれること
 
 ```go
-// stock_allocation_service_test.go
-package domain_test
-
-import (
-    "testing"
-    "yourproject/domain"
-)
-
-func TestStockAllocationService_Allocate_AllSuccess(t *testing.T) {
-    // テストデータの準備
-    service := &domain.StockAllocationService{}
-
-    // 注文を作成（2つの商品）
-    order := createTestOrder(
-        orderLine("PROD-001", 10),
-        orderLine("PROD-002", 5),
-    )
-
-    // 在庫を作成（十分な在庫あり）
-    stocks := map[domain.ProductID]*domain.Stock{
-        "PROD-001": createTestStock("PROD-001", 100),
-        "PROD-002": createTestStock("PROD-002", 50),
-    }
-
-    // 引当実行
-    result, err := service.Allocate(order, stocks)
-
-    // 検証
-    if err != nil {
-        t.Errorf("expected no error, got %v", err)
-    }
-    if !result.Success {
-        t.Error("expected success")
-    }
-    if len(result.FailedItems) != 0 {
-        t.Errorf("expected no failed items, got %d", len(result.FailedItems))
-    }
-    // Stockの状態も確認
-    if stocks["PROD-001"].Available().Value() != 90 {
-        t.Errorf("expected available 90, got %d", stocks["PROD-001"].Available().Value())
-    }
-}
-
-func TestStockAllocationService_Allocate_PartialFailure(t *testing.T) {
-    service := &domain.StockAllocationService{}
-
-    // 注文を作成
-    order := createTestOrder(
-        orderLine("PROD-001", 10),
-        orderLine("PROD-002", 100), // 在庫不足
-    )
-
-    // 在庫を作成（PROD-002は在庫不足）
-    stocks := map[domain.ProductID]*domain.Stock{
-        "PROD-001": createTestStock("PROD-001", 100),
-        "PROD-002": createTestStock("PROD-002", 50), // 不足
-    }
-
-    // 引当実行
-    result, err := service.Allocate(order, stocks)
-
-    // 検証
-    if err != nil {
-        t.Errorf("expected no error, got %v", err)
-    }
-    if result.Success {
-        t.Error("expected failure")
-    }
-    if len(result.FailedItems) != 1 {
-        t.Errorf("expected 1 failed item, got %d", len(result.FailedItems))
-    }
-    if result.FailedItems[0] != "PROD-002" {
-        t.Error("expected PROD-002 to fail")
-    }
-}
+// テストのヘルパー関数例（自分で実装）
+func createTestOrder(lines ...OrderLine) Order { /* 実装 */ }
+func createTestStock(productID string, available int) *Stock { /* 実装 */ }
 ```
 
 ### ポイント
@@ -1006,34 +763,22 @@ package domain
 // - NewOrderConfirmed コンストラクタで生成
 // - DomainEvent インターフェースを実装
 
-// エンティティ内でイベントを保持する例
+// エンティティ内でイベントを保持するパターン
 type Order struct {
     id           OrderID
     status       OrderStatus
-    domainEvents []DomainEvent  // イベントを保持
+    domainEvents []DomainEvent  // イベントを保持するスライス
 }
 
-func (o *Order) Confirm() error {
-    if o.status != Draft {
-        return errors.New("can only confirm draft orders")
-    }
-    o.status = Confirmed
+// Confirmメソッド実装のヒント:
+// 1. ステータスがDraftかチェック
+// 2. ステータスをConfirmedに変更
+// 3. OrderConfirmedイベントを生成してdomainEventsに追加
+// 4. nilを返す
 
-    // ドメインイベントを生成して保持
-    event := NewOrderConfirmed(o.id, o.customerID, o.calculateTotal())
-    o.domainEvents = append(o.domainEvents, event)
-
-    return nil
-}
-
-// イベントを取得して発行（アプリケーション層で使用）
-func (o *Order) DomainEvents() []DomainEvent {
-    return o.domainEvents
-}
-
-func (o *Order) ClearDomainEvents() {
-    o.domainEvents = nil
-}
+// 必要なメソッド:
+// - DomainEvents() []DomainEvent: 保持しているイベントを返す
+// - ClearDomainEvents(): イベントをクリアする（発行後にアプリケーション層から呼ばれる）
 ```
 
 ### ポイント
@@ -1123,37 +868,20 @@ type ConfirmOrderOutput struct {
 
 // Execute メソッドの処理フロー:
 func (u *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInput) (ConfirmOrderOutput, error) {
-    // 1. 注文を取得
-    order, err := u.orderRepo.FindByID(ctx, input.OrderID)
-
+    // 実装のステップ:
+    // 1. 注文を取得（OrderRepository.FindByID）
     // 2. 注文の商品IDリストを取得
-    productIDs := extractProductIDs(order)
+    // 3. 在庫を取得（StockRepository.FindByProductIDs）
+    // 4. 在庫を引き当て（StockAllocationService.Allocate）
+    //    - 引当失敗時はエラーを返す
+    // 5. 注文を確定（order.Confirm()）
+    // 6. 永続化（注文と在庫の両方をSave）
+    // 7. ドメインイベント発行（publisher.Publish）
+    // 8. 結果を返す
 
-    // 3. 在庫を取得（StockRepository経由）
-    stocks, err := u.stockRepo.FindByProductIDs(ctx, productIDs)
-
-    // 4. 在庫を引き当て（StockAllocationService使用）
-    result, err := u.allocSvc.Allocate(order, stocks)
-
-    // 5. 注文を確定（ドメインのメソッド呼び出し）
-    err = order.Confirm()
-
-    // 6. 永続化（注文と在庫の両方）
-    err = u.orderRepo.Save(ctx, order)
-    for _, stock := range stocks {
-        err = u.stockRepo.Save(ctx, stock)
-    }
-
-    // 7. ドメインイベント発行
-    // 注意: order.Total()はMoney型を返すべき（値オブジェクトの一貫性）
-    total, err := order.Total()
-    if err != nil {
-        return ConfirmOrderOutput{}, err
-    }
-    event := domain.NewOrderConfirmed(order.ID(), order.CustomerID(), total)
-    u.publisher.Publish(ctx, event)
-
-    return ConfirmOrderOutput{Success: true, Message: "注文を確定しました"}, nil
+    // 注意点:
+    // - 各ステップでエラーハンドリングを適切に行う
+    // - order.Total()はMoney型を返すべき（値オブジェクトの一貫性）
 }
 
 // 注意: Order.Total()の実装
@@ -1334,38 +1062,44 @@ ECサイトを以下のコンテキストに分割し、設計してください
 3. **同じ言葉でもコンテキストごとに意味が異なる**のは正常（ユビキタス言語の境界）
 4. **コンテキスト間は結果整合性**で連携（ドメインイベント経由）
 
-### 腐敗防止層（ACL）の実装例
+### 腐敗防止層（ACL）の実装ヒント
+
+腐敗防止層は、外部システムのモデルが自ドメインに侵入することを防ぐ「翻訳層」です。
+
 ```go
 // 外部決済サービスのレスポンス（外部モデル）
+// - 外部システムが定義した型（自分でコントロールできない）
 type ExternalPaymentResponse struct {
     TransactionID string
     StatusCode    int  // 0: success, 1: failure
     ErrorMsg      string
 }
 
-// 腐敗防止層: 外部モデルをドメインモデルに変換
+// 自ドメインの型（自分でコントロールできる）
+type PaymentResult struct {
+    Success       bool
+    TransactionID TransactionID  // ドメインの値オブジェクト
+    Error         error
+}
+
+// PaymentGatewayAdapter 腐敗防止層の役割を担う
 type PaymentGatewayAdapter struct {
     externalClient *ExternalPaymentClient
 }
 
-func (a *PaymentGatewayAdapter) ProcessPayment(payment *Payment) (*PaymentResult, error) {
-    // 外部サービスの呼び出し
-    extResp, err := a.externalClient.Charge(payment.Amount(), payment.CardToken())
-
-    // 外部モデルをドメインモデルに変換（腐敗防止層の役割）
-    if extResp.StatusCode == 0 {
-        return &PaymentResult{
-            Success:       true,
-            TransactionID: domain.TransactionID(extResp.TransactionID),
-        }, nil
-    } else {
-        return &PaymentResult{
-            Success: false,
-            Error:   errors.New(extResp.ErrorMsg),
-        }, nil
-    }
-}
+// ProcessPayment 実装のポイント:
+// 1. 外部クライアントを呼び出して外部レスポンスを取得
+// 2. 外部レスポンスを自ドメインの型（PaymentResult）に変換
+//    - StatusCodeの数値を意味のあるSuccessフラグに変換
+//    - 外部のTransactionID（string）をドメインの値オブジェクトに変換
+//    - ErrorMsgをGoのerror型に変換
+// 3. ドメインモデルを返す
 ```
+
+**実装時の考慮点:**
+- 外部システムの変更が自ドメインに影響しないようにする
+- 変換ロジックはアダプター内にカプセル化する
+- ドメイン層は外部システムの存在を知らない
 
 ---
 

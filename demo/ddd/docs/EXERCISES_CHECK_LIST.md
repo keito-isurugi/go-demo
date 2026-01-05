@@ -5,48 +5,125 @@
 - [x] 課題1: ユビキタス言語を定義した
   - [x] ビジネスの言葉で記述している（技術用語を使っていない）
   - [x] コードで使う用語と一致している
+  - [x] 用語一覧（日本語・英語・定義）を作成した
+  - [x] 用語間の関係性を記載した
 - [x] 課題2: 値オブジェクト（Money, Quantity, Email, ProductID）を実装した（テスト含む）
   - [x] すべて不変（イミュータブル）
-  - [x] 等価性で比較している
+  - [x] 等価性で比較している（Equalsメソッド）
   - [x] バリデーションロジックを含んでいる
   - [x] 値オブジェクト同士の演算を実装している（Quantity.Add(other Quantity)など）
   - [x] 計算結果も値オブジェクトの型で返している（Subtotal()やTotal()がMoneyを返す）
   - [x] **注意**: Currency型のスペルが正しいか確認（Currensyではなく）
+  - **Money**
+    - [x] Add, Subtract メソッドを実装した
+    - [x] IsGreaterThan, IsLessThan 比較演算を実装した
+    - [x] 異なる通貨同士の計算・比較はエラーを返す
+  - **Quantity**
+    - [x] Add, Subtract メソッドを実装した（値オブジェクト同士の演算）
+    - [x] Multiply メソッドを実装した（単価×数量の計算に使用）
+    - [x] IsZero メソッドを実装した
+  - **Email**
+    - [x] 形式バリデーションを実装した
+    - [x] 正規化（小文字化、前後の空白除去）を実装した
+    - [x] Domain() メソッドを実装した（@以降を取得）
+  - **ProductID**
+    - [x] 空文字列を許可しないバリデーションを実装した
 - [x] 課題3: エンティティ（Order, OrderLine）を実装した（テスト含む）
   - [x] 一意の識別子を持っている
   - [x] ビジネスルールをカプセル化している
-  - [x] 状態遷移のルールを実装している
+  - [x] 状態遷移のルールを実装している（Confirm, Pay, Ship, Deliver, Cancel）
+  - [x] ファクトリメソッドを使ってエンティティを生成している
+  - [x] OrderLineを「エンティティ」か「値オブジェクト」として検討した
   - [ ] 状態遷移図を作成した
   - [ ] すべての状態遷移についてテストを書いた
+    - [ ] 許可される遷移のテスト（Draft→Confirmed, Confirmed→Paid など）
+    - [ ] 禁止される遷移のテスト（Confirmed→Draft, Paid→Cancelled など）
 - [ ] 課題4: 集約を設計・実装した
-  - [x] Order集約（Order + OrderLine）
-  - [ ] Stock集約（Stockエンティティ）
-  - [x] 各集約の不変条件を保護している
-  - [x] 重複商品チェックの実装（同じProductIDの明細を2回追加できない）
-  - [x] 合計金額の上限チェックの実装
-  - [x] 集約ルート経由でのみアクセスしている
-  - [x] 集約間はIDで参照している
-  - [ ] Stockエンティティのテストを書いた（Reserve, Release, CanReserve）
+  - **Order集約**
+    - [x] Order（集約ルート）+ OrderLine を実装した
+    - [x] 集約ルート経由でのみOrderLineにアクセスしている
+    - [x] 重複商品チェックの実装（同じProductIDの明細を2回追加できない）
+    - [x] 合計金額の上限チェックの実装（例: 100万円）
+    - [x] Draft状態でのみ明細の追加・削除を許可している
+    - [x] 注文明細が0件の状態では注文を確定できない
+  - **Stock集約**
+    - [x] Stockエンティティを実装した（ProductID, Available, Reserved）
+    - [x] Reserve メソッドを実装した（利用可能在庫から引当済みへ移動）
+    - [x] Release メソッドを実装した（引当済みから利用可能在庫へ戻す）
+    - [x] CanReserve メソッドを実装した
+    - [x] 不変条件を保護している（利用可能・引当済みが0未満にならない）
+    - [ ] Stockエンティティのテストを書いた
+  - [x] 集約間はIDで参照している（オブジェクト参照を避ける）
 - [ ] 課題5: ドメインサービスを実装した
-  - [ ] StockAllocationService（Stockエンティティのメソッドを使用）
-  - [ ] DiscountService
-  - [ ] ドメインサービスはステートレス
-  - [ ] StockAllocationServiceのテストを書いた（成功ケース、部分失敗ケース）
-  - [ ] Stockの状態変化もテストで確認している
+  - **StockAllocationService**
+    - [ ] Allocateメソッドを実装した（Order, stocks map を受け取る）
+    - [ ] AllocationResult型を定義した（Success, AllocatedItems, FailedItems, Message）
+    - [ ] AllocatedItem型を定義した
+    - [ ] Stockエンティティのメソッド（Reserve, CanReserve）を呼び出して引当処理を行っている
+    - [ ] ドメインサービス自身は状態を変更しない（エンティティに委譲する）
+    - [ ] テスト: 全商品の引当成功ケース
+    - [ ] テスト: 部分失敗ケース（一部の商品が在庫不足）
+    - [ ] テスト: 在庫が存在しない商品があるケース
+    - [ ] テスト: Stockエンティティの状態変化を確認している
+  - **DiscountService（オプション）**
+    - [ ] 複数のドメインオブジェクトを協調させている
+    - [ ] 割引計算のビジネスルールをカプセル化している
+  - [ ] ドメインサービスはステートレス（状態を持たない）
 - [ ] 課題6: リポジトリパターンを実装した
-  - [ ] OrderRepositoryインターフェース（ドメイン層）
-  - [ ] StockRepositoryインターフェース（ドメイン層）
-  - [ ] リポジトリ実装（インフラストラクチャ層）
+  - **インターフェース（ドメイン層）**
+    - [ ] OrderRepositoryインターフェースを定義した（Save, FindByID, FindByCustomerID, Delete）
+    - [ ] StockRepositoryインターフェースを定義した（Save, FindByProductID, FindByProductIDs, Delete）
+    - [ ] contextを第一引数に取っている
+  - **実装（インフラストラクチャ層）**
+    - [ ] OrderRepository実装を作成した
+    - [ ] StockRepository実装を作成した
+    - [ ] ドメインオブジェクトとDBエンティティのマッピングを適切に行っている
+    - [ ] 集約全体を取得・永続化している（部分的な操作は行わない）
 - [ ] 課題7: ドメインイベントを実装した
+  - **DomainEventインターフェース**
+    - [ ] OccurredAt(), AggregateID(), EventType() メソッドを定義した
+  - **OrderConfirmed**
+    - [ ] orderID, customerID, totalAmount, occurredAt をフィールドに持つ
+    - [ ] エンティティ（Order）内でイベントを生成・保持している
+  - **PaymentCompleted**
+    - [ ] 支払い完了時に発行される
+  - **StockDepleted**
+    - [ ] 在庫が閾値を下回ったときに発行される
+  - [ ] イベントは不変（フィールドは非公開、getterのみ提供）
+  - [ ] DomainEvents() メソッドを実装した（保持しているイベントを返す）
+  - [ ] ClearDomainEvents() メソッドを実装した（発行後にクリア）
 - [ ] 課題8: アプリケーションサービスを実装した
-  - [ ] StockRepositoryを使用して在庫を取得
-  - [ ] StockAllocationServiceを使用して引当処理
-  - [ ] 複数のリポジトリを協調させている
+  - **CreateOrderUseCase**
+    - [ ] 顧客IDと商品リストから注文を作成できる
+    - [ ] ドメインの不変条件を保証している
+  - **ConfirmOrderUseCase**
+    - [ ] OrderRepositoryを使用して注文を取得している
+    - [ ] StockRepositoryを使用して在庫を取得している
+    - [ ] StockAllocationServiceを使用して引当処理を行っている
+    - [ ] 注文と在庫の両方を同一トランザクションで永続化している
+    - [ ] ドメインイベントを発行している
+    - [ ] DTOを使用して入出力をドメインオブジェクトから分離している
+  - **ProcessPaymentUseCase**
+    - [ ] 外部決済サービスと連携している
+    - [ ] 支払い結果を注文に反映している
   - [ ] Order.Total()がMoney型を返している（値オブジェクトの一貫性）
+  - [ ] アプリケーション層にビジネスロジックが漏れていない
 - [ ] 課題9: コンテキストマップを作成した
-  - [ ] OrderとStockが同じコンテキスト内にある理由を理解
+  - [ ] context_map.md を作成した
+  - [ ] コンテキストマップを図で表現した
+  - [ ] 各コンテキストの責務とユビキタス言語を記載した
+  - [ ] コンテキスト間の連携方法とパターン名を明記した
+  - [ ] OrderとStockが同じコンテキスト内にある理由を理解した
   - [ ] 各コンテキストでの「在庫」の意味の違いを説明できる
+  - **腐敗防止層（ACL）**
+    - [ ] 外部システムのモデルから自ドメインを保護する翻訳層を理解した
+    - [ ] PaymentGatewayAdapter などの実装例を検討した
 - [ ] 課題10: 総合演習を完了した
+  - [ ] 注文管理システムの全機能を実装した
+  - [ ] クリーンアーキテクチャに基づいた層分離ができている
+  - [ ] 単体テストのカバレッジ80%以上
+  - [ ] ドメインイベントによる疎結合な設計ができている
+  - [ ] 技術的分類ではなくドメイン単位でディレクトリを切っている
 
 ### DDDベストプラクティスの確認（エリック・エヴァンスの原則）
 
