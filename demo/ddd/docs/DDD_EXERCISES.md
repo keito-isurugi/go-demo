@@ -1,9 +1,17 @@
-    # DDD（ドメイン駆動設計）学習課題
+# DDD（ドメイン駆動設計）学習課題
 
 ## 概要
 
 この課題では、実際の業務で活用できるDDDの知識を身につけることを目的としています。
 ECサイトの「注文管理システム」を題材に、DDDの各概念を段階的に学習していきます。
+
+### この課題集の設計方針
+
+**目的**: 学習者がDDDの概念を**自分で考えて理解する**ことを重視しています。
+
+- **完全な実装例は提供しない**: 実装の「答え」を与えると、コピー&ペーストで終わり、概念理解が浅くなる
+- **ヒントはコメント形式**: 何を実装すべきかの指針は示すが、具体的なコードは自分で書く
+- **概念理解 > 実装詳細**: DDDのパターンがなぜ必要なのかを理解することが最優先
 
 ### 学習の範囲について
 - **課題1-8**: 「注文コンテキスト」という**単一の境界づけられたコンテキスト内**での戦術的設計を学びます
@@ -15,20 +23,20 @@ ECサイトの「注文管理システム」を題材に、DDDの各概念を段
 この段階的アプローチにより、まず基礎を固めてから全体像を学べます。
 
 ## 学習の進め方
-1. **課題1-2**: DDDの基礎概念を理解する（1-2日）
-   - ユビキタス言語の定義とコミュニケーション
+1. **課題1-2**: DDDの基礎概念を理解する
+   - ユビキタス言語の定義
    - 値オブジェクトによるドメイン概念の表現
-2. **課題3-4**: エンティティと集約の設計を学ぶ（2-3日）
+2. **課題3-4**: エンティティと集約の設計を学ぶ
    - ライフサイクルと同一性の管理
    - トランザクション境界の設計
-3. **課題5-6**: ドメインサービスとリポジトリを実装する（2-3日）
+3. **課題5-6**: ドメインサービスとリポジトリを実装する
    - リッチドメインモデル vs 貧血ドメインモデル
    - 永続化の抽象化
-4. **課題7-8**: イベント駆動とユースケースを実装する（3-4日）
+4. **課題7-8**: イベント駆動とユースケースを実装する
    - 疎結合な設計
    - アプリケーション層とドメイン層の分離
-5. **課題9-10**: 全体設計と統合（3-5日）
-   - 戦略的設計
+5. **課題9**: 戦略的設計
+   - 境界づけられたコンテキスト
    - コンテキストマップの作成
 ---
 
@@ -290,15 +298,8 @@ Cancelled Cancelled   ✗
 2. **集約ルート経由のアクセス**
    - OrderLineへの操作はすべてOrder経由で行う
    - 外部からOrderLineを直接変更できないようにする
-   - **実装例**:
-     ```go
-     // ❌ 悪い例: OrderLineを直接操作
-     orderLine := order.Lines[0]
-     orderLine.ChangeQuantity(newQty)
-
-     // ✅ 良い例: Order経由で操作
-     order.ChangeOrderLineQuantity(productID, newQty)
-     ```
+   - ❌ **悪い例**: OrderLineを直接取得して変更する
+   - ✅ **良い例**: Orderのメソッド経由で操作する（例: `ChangeOrderLineQuantity`）
 
 3. **不変条件の保護**
 
@@ -449,19 +450,11 @@ StockAllocationServiceは、Stockエンティティの`Reserve()`, `CanReserve()
    - **ドメインサービス自身は状態を変更しない**（エンティティに委譲する）
    - **ドメインサービスはビジネスルールを判断**する（どの在庫から引き当てるか、部分引当を許可するかなど）
 
-2. **割引計算サービス（DiscountService）**（オプション課題）
-   - 顧客ランク、購入金額、クーポンに基づいて割引額を計算
-   - 複数の割引ルールを組み合わせる
-   - **重要**: 複数のドメインオブジェクト（Order, Customer, DiscountPolicy）を協調させる
-   - **割引計算のビジネスルール**をカプセル化する
-
 ### 実装場所
 ```
 domain/
   stock_allocation_service.go
   stock_allocation_service_test.go
-  discount_service.go         # オプション
-  discount_service_test.go    # オプション
 ```
 
 ### StockAllocationService実装のヒント
@@ -470,82 +463,32 @@ domain/
 package domain
 
 // StockAllocationService 在庫引当サービス
-// 複数の集約（OrderとStock）をまたがるロジックを担当
-    // ステートレス（状態を持たない）
+// - ステートレスな構造体
 
 // AllocationResult 引当結果
-type AllocationResult struct {
-    Success        bool
-    AllocatedItems []AllocatedItem
-    FailedItems    []ProductID
-    Message        string
-}
+// - 成功/失敗のフラグ
+// - 引当できた商品のリスト
+// - 引当できなかった商品のリスト
+// - メッセージ
+
+// AllocatedItem 引当された商品情報
+// - 商品ID
+// - 引当数量
 
 // Allocate 注文に対して在庫を引き当てる
-// 引数:
-//   - order: 引当対象の注文
-//   - stocks: 商品ごとの在庫エンティティ（map[ProductID]*Stock）
-// 戻り値:
-//   - AllocationResult: 引当結果
-//   - error: エラー
-    // 1. 注文の各明細行をループ
-    // 2. 各商品について:
-    //    a. Stockエンティティが存在するか確認
-    //    b. stock.CanReserve(quantity) で引当可能かチェック
-    //    c. 引当可能なら stock.Reserve(quantity) で引当実行
-    //    d. 引当不可なら失敗としてマーク
-    //    e. 結果をAllocationResultに追加
-    // 3. すべての商品が引当成功した場合のみSuccess=true
-    // 4. 結果を返す
-
-    // 注意: エラーが発生した場合の補償トランザクション（引当済みを戻す）は
-    // アプリケーション層のトランザクション管理で対応
-
-// Allocateメソッドのシグネチャ:
-func (s *StockAllocationService) Allocate(
-    order Order,
-    stocks map[ProductID]*Stock,
-) (AllocationResult, error)
+// - 引数: Order, stocks map[ProductID]*Stock
+// - 戻り値: AllocationResult, error
 
 // 実装のポイント:
-// - AllocationResultを初期化（Success: trueで開始）
-// - order.Lines()をループして各明細を処理
-// - stocksマップから在庫を取得し、存在チェック
-// - CanReserve()で引当可能かチェック
-// - Reserve()で実際に引当を実行
-// - 成功/失敗に応じてAllocatedItems/FailedItemsに追加
+// - 注文の各明細をループし、stocksマップから在庫を取得
+// - CanReserve() → Reserve() の順で引当処理
 // - すべて成功した場合のみSuccess=true
-// - 適切なメッセージを設定
 ```
 
-### StockAllocationServiceのテストケース
-
-以下のテストケースを実装してください：
-
-1. **TestStockAllocationService_Allocate_AllSuccess**
-   - 複数商品の注文に対して、すべて十分な在庫がある場合
-   - 検証項目:
-     - エラーが発生しないこと
-     - result.Successがtrueであること
-     - FailedItemsが空であること
-     - **Stockエンティティの状態が正しく変更されていること**（Available減少、Reserved増加）
-
-2. **TestStockAllocationService_Allocate_PartialFailure**
-   - 一部の商品が在庫不足の場合
-   - 検証項目:
-     - result.Successがfalseであること
-     - FailedItemsに在庫不足の商品IDが含まれること
-
-3. **TestStockAllocationService_Allocate_StockNotFound**
-   - stocksマップに存在しない商品がある場合
-   - 検証項目:
-     - 該当商品がFailedItemsに含まれること
-
-```go
-// テストのヘルパー関数例（自分で実装）
-func createTestOrder(lines ...OrderLine) Order { /* 実装 */ }
-func createTestStock(productID string, available int) *Stock { /* 実装 */ }
-```
+### テストケース
+- 全商品の引当成功ケース
+- 部分失敗ケース（一部在庫不足）
+- 在庫が存在しない商品があるケース
 
 ### ポイント
 - **ドメインサービスは状態を持たない**（ステートレス）
@@ -557,32 +500,9 @@ func createTestStock(productID string, available int) *Stock { /* 実装 */ }
 
 ### アンチパターン: 貧血ドメインモデル
 **避けるべきパターン**: ドメインサービスにすべてのロジックを集約し、エンティティをデータホルダーにしてしまうこと
-```go
-// ❌ 悪い例: 貧血ドメインモデル
-type Order struct {
-    ID     OrderID
-    Status OrderStatus  // ただのデータホルダー
-}
 
-type OrderService struct {}
-func (s *OrderService) ConfirmOrder(order *Order) {
-    order.Status = Confirmed  // ビジネスロジックがサービスに集中
-}
-
-// ✅ 良い例: リッチドメインモデル
-type Order struct {
-    id     OrderID
-    status OrderStatus
-}
-
-func (o *Order) Confirm() error {
-    if o.status != Draft {
-        return errors.New("can only confirm draft orders")
-    }
-    o.status = Confirmed  // ビジネスロジックはエンティティ内に
-    return nil
-}
-```
+- ❌ **悪い例**: エンティティがデータのみを持ち、サービスがすべてのロジックを持つ
+- ✅ **良い例**: エンティティが自身のビジネスルールをメソッドとして持つ（リッチドメインモデル）
 
 ---
 
@@ -639,23 +559,16 @@ infrastructure/
 // domain/stock_repository.go
 package domain
 
-import "context"
-
 // StockRepository 在庫リポジトリのインターフェース
-type StockRepository interface {
-    // Save 在庫を保存
-    Save(ctx context.Context, stock *Stock) error
-
-    // FindByProductID 商品IDで在庫を取得
-    FindByProductID(ctx context.Context, productID ProductID) (*Stock, error)
-
-    // FindByProductIDs 複数の商品IDで在庫を一括取得
-    // 注文の引当処理で使用
-    FindByProductIDs(ctx context.Context, productIDs []ProductID) (map[ProductID]*Stock, error)
-
-    // Delete 在庫を削除
-    Delete(ctx context.Context, productID ProductID) error
-}
+// 必要なメソッド:
+// - Save: 在庫を保存
+// - FindByProductID: 商品IDで在庫を取得
+// - FindByProductIDs: 複数の商品IDで在庫を一括取得（引当処理で使用）
+// - Delete: 在庫を削除
+//
+// ポイント:
+// - contextを第一引数に取る
+// - 戻り値でエラーを返す
 ```
 
 ### ポイント
@@ -677,23 +590,8 @@ type StockRepository interface {
 - **DAO（Data Access Object）**: データベーステーブル単位でCRUD操作を提供（技術的な視点）
 - **Repository**: 集約単位でドメインオブジェクトの永続化を抽象化（ドメインの視点）
 
-```go
-// ❌ DAOパターン（テーブル単位）
-type OrderDAO interface {
-    Insert(order *OrderTable) error
-    Update(order *OrderTable) error
-}
-
-type OrderLineDAO interface {
-    InsertBatch(lines []*OrderLineTable) error
-}
-
-// ✅ Repositoryパターン（集約単位）
-type OrderRepository interface {
-    Save(ctx context.Context, order *Order) error  // Order集約全体を保存
-    FindByID(ctx context.Context, id OrderID) (*Order, error)  // Order集約全体を取得
-}
-```
+- ❌ **DAOパターン**: テーブルごとにDAO（OrderDAO, OrderLineDAO）を作成
+- ✅ **Repositoryパターン**: 集約単位でRepository（OrderRepository）を作成し、集約全体を保存・取得
 
 ---
 
@@ -763,12 +661,9 @@ package domain
 // - NewOrderConfirmed コンストラクタで生成
 // - DomainEvent インターフェースを実装
 
-// エンティティ内でイベントを保持するパターン
-type Order struct {
-    id           OrderID
-    status       OrderStatus
-    domainEvents []DomainEvent  // イベントを保持するスライス
-}
+// エンティティ内でイベントを保持するパターン:
+// - Orderエンティティに domainEvents []DomainEvent フィールドを追加
+// - 状態変更時にイベントを生成してスライスに追加
 
 // Confirmメソッド実装のヒント:
 // 1. ステータスがDraftかチェック
@@ -777,7 +672,7 @@ type Order struct {
 // 4. nilを返す
 
 // 必要なメソッド:
-// - DomainEvents() []DomainEvent: 保持しているイベントを返す
+// - DomainEvents(): 保持しているイベントを返す
 // - ClearDomainEvents(): イベントをクリアする（発行後にアプリケーション層から呼ばれる）
 ```
 
@@ -844,52 +739,34 @@ application/
 // application/confirm_order.go
 package application
 
-import "context"
-
 // ConfirmOrderUseCase ユースケース構造体
 // 依存として以下を持つ:
-type ConfirmOrderUseCase struct {
-    orderRepo   domain.OrderRepository      // 注文の永続化
-    stockRepo   domain.StockRepository      // 在庫の取得・永続化
-    allocSvc    *domain.StockAllocationService  // 在庫引当サービス
-    publisher   EventPublisher              // イベント発行
-}
+// - OrderRepository: 注文の永続化
+// - StockRepository: 在庫の取得・永続化
+// - StockAllocationService: 在庫引当サービス
+// - EventPublisher: イベント発行
 
 // ConfirmOrderInput 入力DTO
-type ConfirmOrderInput struct {
-    OrderID domain.OrderID
-}
+// - 注文IDを持つ
 
 // ConfirmOrderOutput 出力DTO
-type ConfirmOrderOutput struct {
-    Success bool
-    Message string
-}
+// - 成功/失敗のフラグ
+// - メッセージ
 
 // Execute メソッドの処理フロー:
-func (u *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInput) (ConfirmOrderOutput, error) {
-    // 実装のステップ:
-    // 1. 注文を取得（OrderRepository.FindByID）
-    // 2. 注文の商品IDリストを取得
-    // 3. 在庫を取得（StockRepository.FindByProductIDs）
-    // 4. 在庫を引き当て（StockAllocationService.Allocate）
-    //    - 引当失敗時はエラーを返す
-    // 5. 注文を確定（order.Confirm()）
-    // 6. 永続化（注文と在庫の両方をSave）
-    // 7. ドメインイベント発行（publisher.Publish）
-    // 8. 結果を返す
+// 1. 注文を取得（OrderRepository.FindByID）
+// 2. 注文の商品IDリストを取得
+// 3. 在庫を取得（StockRepository.FindByProductIDs）
+// 4. 在庫を引き当て（StockAllocationService.Allocate）
+//    - 引当失敗時はエラーを返す
+// 5. 注文を確定（order.Confirm()）
+// 6. 永続化（注文と在庫の両方をSave）
+// 7. ドメインイベント発行（publisher.Publish）
+// 8. 結果を返す
 
-    // 注意点:
-    // - 各ステップでエラーハンドリングを適切に行う
-    // - order.Total()はMoney型を返すべき（値オブジェクトの一貫性）
-}
-
-// 注意: Order.Total()の実装
-// ❌ 悪い例: intを返す
-// func (o Order) Total() int
-
-// ✅ 良い例: Moneyを返す（値オブジェクトの一貫性を保つ）
-// func (o Order) Total() (Money, error)
+// 注意点:
+// - 各ステップでエラーハンドリングを適切に行う
+// - order.Total()はMoney型を返すべき（値オブジェクトの一貫性）
 ```
 
 ### 重要なポイント
@@ -901,31 +778,9 @@ func (u *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInp
 - **DTOを使用**して入出力をドメインオブジェクトから分離
 
 ### アプリケーション層とドメイン層の責務分離
-```go
-// ❌ 悪い例: アプリケーション層にビジネスロジック
-func (u *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInput) error {
-    order, _ := u.orderRepo.FindByID(ctx, input.OrderID)
 
-    // ビジネスロジックがアプリケーション層に漏れている
-    if order.Status != Draft {
-        return errors.New("can only confirm draft orders")
-    }
-    order.Status = Confirmed  // 直接状態を変更
-}
-
-// ✅ 良い例: ビジネスロジックはドメイン層に
-func (u *ConfirmOrderUseCase) Execute(ctx context.Context, input ConfirmOrderInput) error {
-    order, _ := u.orderRepo.FindByID(ctx, input.OrderID)
-
-    // ビジネスロジックはドメインのメソッドに委譲
-    if err := order.Confirm(); err != nil {
-        return err
-    }
-
-    // アプリケーション層は協調と永続化のみ
-    u.orderRepo.Save(ctx, order)
-}
-```
+- ❌ **悪い例**: アプリケーション層でステータスを直接チェック・変更する（ビジネスロジックの漏れ）
+- ✅ **良い例**: `order.Confirm()` のようにドメインのメソッドに委譲し、アプリケーション層は協調と永続化のみ行う
 
 ---
 
@@ -1062,131 +917,24 @@ ECサイトを以下のコンテキストに分割し、設計してください
 3. **同じ言葉でもコンテキストごとに意味が異なる**のは正常（ユビキタス言語の境界）
 4. **コンテキスト間は結果整合性**で連携（ドメインイベント経由）
 
-### 腐敗防止層（ACL）の実装ヒント
+### 腐敗防止層（ACL）について
 
 腐敗防止層は、外部システムのモデルが自ドメインに侵入することを防ぐ「翻訳層」です。
 
-```go
-// 外部決済サービスのレスポンス（外部モデル）
-// - 外部システムが定義した型（自分でコントロールできない）
-type ExternalPaymentResponse struct {
-    TransactionID string
-    StatusCode    int  // 0: success, 1: failure
-    ErrorMsg      string
-}
-
-// 自ドメインの型（自分でコントロールできる）
-type PaymentResult struct {
-    Success       bool
-    TransactionID TransactionID  // ドメインの値オブジェクト
-    Error         error
-}
-
-// PaymentGatewayAdapter 腐敗防止層の役割を担う
-type PaymentGatewayAdapter struct {
-    externalClient *ExternalPaymentClient
-}
-
-// ProcessPayment 実装のポイント:
-// 1. 外部クライアントを呼び出して外部レスポンスを取得
-// 2. 外部レスポンスを自ドメインの型（PaymentResult）に変換
-//    - StatusCodeの数値を意味のあるSuccessフラグに変換
-//    - 外部のTransactionID（string）をドメインの値オブジェクトに変換
-//    - ErrorMsgをGoのerror型に変換
-// 3. ドメインモデルを返す
-```
-
-**実装時の考慮点:**
-- 外部システムの変更が自ドメインに影響しないようにする
-- 変換ロジックはアダプター内にカプセル化する
+**概念:**
+- 外部システムのレスポンス（StatusCode: 0/1 など）を自ドメインの型（Success: bool など）に変換
+- 変換ロジックはアダプター内にカプセル化
 - ドメイン層は外部システムの存在を知らない
+
+**実装例:**
+- `PaymentGatewayAdapter` が外部決済サービスのレスポンスを `PaymentResult` に変換
 
 ---
 
-## 課題10: 総合演習 - 完全なDDDアプリケーション
+## 補足: ディレクトリ構成のポイント
 
-### 目的
-これまでの学習内容を統合し、実践的なアプリケーションを構築する。
-
-### 課題内容
-
-「注文管理システム」を完成させてください：
-
-**機能要件:**
-1. 顧客が商品を選択して注文を作成できる
-2. 注文を確定すると在庫が引き当てられる
-3. 支払いを処理できる
-4. 支払い完了後、出荷準備に移行する
-5. 注文のキャンセルができる（条件付き）
-
-**非機能要件:**
-1. クリーンアーキテクチャに基づいた層分離
-2. 単体テストのカバレッジ80%以上
-3. ドメインイベントによる疎結合な設計
-
-### 最終的なディレクトリ構成
-```
-demo/ddd/
-├── cmd/
-│   └── server/
-│       └── main.go
-├── domain/
-│   ├── order/              # 注文集約（集約ルート + 関連エンティティ）
-│   │   ├── order.go
-│   │   ├── order_line.go
-│   │   └── order_test.go
-│   ├── stock.go            # 在庫エンティティ（Stock集約）
-│   ├── stock_test.go
-│   ├── money.go            # 値オブジェクト
-│   ├── quantity.go
-│   ├── email.go
-│   ├── event.go            # ドメインイベントインターフェース
-│   ├── order_confirmed.go
-│   ├── payment_completed.go
-│   ├── stock_depleted.go
-│   ├── order_repository.go      # リポジトリインターフェース
-│   ├── stock_repository.go      # 在庫リポジトリインターフェース
-│   ├── stock_allocation_service.go  # ドメインサービス
-│   └── discount_service.go
-├── application/
-│   ├── create_order.go
-│   ├── confirm_order.go        # StockRepositoryを使用
-│   ├── process_payment.go
-│   └── order_event_handler.go
-├── infrastructure/
-│   ├── persistence/
-│   │   ├── order_repository.go     # リポジトリ実装
-│   │   ├── order_repository_test.go
-│   │   ├── stock_repository.go     # 在庫リポジトリ実装
-│   │   └── stock_repository_test.go
-│   └── external/
-├── interfaces/
-│   └── api/
-│       └── handler/
-├── docs/
-│   └── ubiquitous_language.md
-└── go.mod
-```
-
-### ディレクトリ構成のポイント
 - **技術的分類（valueobject, entity, service等）でディレクトリを切らない**
   - ❌ 悪い例: `domain/valueobjects/`, `domain/entities/`, `domain/services/`
   - ✅ 良い例: `domain/order/`, `domain/stock.go`, `domain/money.go`
-  - エリック・エヴァンスは「**ドメインの概念を表現する構造**」を推奨
 - **機能ドメイン単位（order等）でディレクトリを切る**
-  - Goでは大きな集約の場合のみサブディレクトリを作成
-  - 小さな集約や値オブジェクトはdomainパッケージ直下に配置
-- **各集約ごとにエンティティを作成**（Order集約、Stock集約）
-- **各集約ごとにリポジトリインターフェースを定義**
-- **ドメインサービスは複数の集約を協調させる役割**（StockAllocationServiceはOrderとStockを協調）
 - **課題1-8で実装したコードは単一の境界づけられたコンテキスト**内に収まる
-
-### エリック・エヴァンスのレイヤードアーキテクチャ
-DDDでは以下の4層構造を推奨：
-
-1. **プレゼンテーション層（Interfaces）**: ユーザーとの対話、リクエスト/レスポンスの変換
-2. **アプリケーション層（Application）**: ユースケースの実装、ドメインオブジェクトの協調
-3. **ドメイン層（Domain）**: ビジネスロジック、エンティティ、値オブジェクト、集約、ドメインサービス
-4. **インフラストラクチャ層（Infrastructure）**: 永続化、外部サービス連携、技術的詳細
-
-**依存性の方向**: 外側から内側へ（プレゼンテーション → アプリケーション → ドメイン ← インフラストラクチャ）
