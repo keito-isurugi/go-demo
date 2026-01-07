@@ -10,7 +10,7 @@ func NewQuantity(value int) (Quantity, error) {
 	if value < 0 {
 		return Quantity{}, errors.New("quantity must be non-negative")
 	}
-	
+
 	return Quantity{value: value}, nil
 }
 

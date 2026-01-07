@@ -10,7 +10,7 @@ const (
 )
 
 type Money struct {
-	amount int
+	amount   int
 	currency Currency
 }
 
@@ -20,7 +20,7 @@ func NewMoney(amount int, currency Currency) (Money, error) {
 	}
 
 	return Money{
-		amount: amount,
+		amount:   amount,
 		currency: currency,
 	}, nil
 }

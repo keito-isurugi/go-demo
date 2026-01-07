@@ -5,10 +5,10 @@ import "errors"
 type ProductName string
 
 type OrderLine struct {
-	id ProductID
+	id          ProductID
 	productName ProductName
-	price Money
-	quantity Quantity
+	price       Money
+	quantity    Quantity
 }
 
 func NewOrderLine(id ProductID, productName ProductName, money Money, quantity Quantity) (OrderLine, error) {
@@ -21,10 +21,10 @@ func NewOrderLine(id ProductID, productName ProductName, money Money, quantity Q
 	}
 
 	return OrderLine{
-		id: id,
+		id:          id,
 		productName: productName,
-		price: money,
-		quantity: quantity,
+		price:       money,
+		quantity:    quantity,
 	}, nil
 }
 

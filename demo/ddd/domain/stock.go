@@ -8,7 +8,7 @@ type Reserved int
 type Stock struct {
 	productID ProductID
 	available Available
-	reserved Reserved
+	reserved  Reserved
 }
 
 func NewStock(productID ProductID, available Available, reserved Reserved) (Stock, error) {
@@ -27,13 +27,13 @@ func NewStock(productID ProductID, available Available, reserved Reserved) (Stoc
 	return Stock{
 		productID: productID,
 		available: available,
-		reserved: reserved,
+		reserved:  reserved,
 	}, nil
 }
 
 func (s Stock) Reserve(quantity int) (Stock, error) {
 	if s.available < Available(quantity) {
-		return Stock{}, errors.New("insufficient available stock") 
+		return Stock{}, errors.New("insufficient available stock")
 	}
 
 	newAvailable := s.available - Available(quantity)
@@ -44,7 +44,7 @@ func (s Stock) Reserve(quantity int) (Stock, error) {
 
 func (s Stock) Release(quantity int) (Stock, error) {
 	if s.reserved < Reserved(quantity) {
-		return Stock{}, errors.New("insufficient reserved stock") 
+		return Stock{}, errors.New("insufficient reserved stock")
 	}
 
 	newAvailable := s.available + Available(quantity)
