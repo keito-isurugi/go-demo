@@ -68,12 +68,12 @@
   - [x] ドメインサービスはステートレス（状態を持たない）
 - [ ] 課題6: リポジトリパターンを実装した
   - **インターフェース（ドメイン層）**
-    - [ ] OrderRepositoryインターフェースを定義した（Save, FindByID, FindByCustomerID, Delete）
-    - [ ] StockRepositoryインターフェースを定義した（Save, FindByProductID, FindByProductIDs, Delete）
-    - [ ] contextを第一引数に取っている
+    - [x] OrderRepositoryインターフェースを定義した（Save, FindByID, FindByCustomerID, Delete）
+    - [x] StockRepositoryインターフェースを定義した（Save, FindByProductID, FindByProductIDs, Delete）
+    - [x] contextを第一引数に取っている
   - **実装（インフラストラクチャ層）**
-    - [ ] OrderRepository実装を作成した
-    - [ ] StockRepository実装を作成した
+    - [x] OrderRepository実装を作成した
+    - [x] StockRepository実装を作成した
     - [ ] ドメインオブジェクトとDBエンティティのマッピングを適切に行っている
     - [ ] 集約全体を取得・永続化している（部分的な操作は行わない）
 - [ ] 課題7: ドメインイベントを実装した

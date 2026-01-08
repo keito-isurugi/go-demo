@@ -312,23 +312,26 @@ Cancelled Cancelled   ✗
 
 ### AddLineメソッド実装のヒント
 ```go
-func (o *Order) AddLine(line OrderLine) error {
-    // 1. ステータスがDraftかチェック
-    //    - Draft以外ならエラーを返す
-
-    // 2. 重複チェック（重要な不変条件）
-    //    - o.linesをループして、同じProductIDが存在しないかチェック
-    //    - 既に存在すればエラーを返す
-
-    // 3. 合計金額の上限チェック
-    //    - 新しい明細を追加した場合の合計金額を計算
-    //    - Money型を使って上限（例: 100万円）と比較
-    //    - 上限を超えていればエラーを返す
-
-    // 4. 明細を追加
-    //    - o.linesにlineを追加
-    //    - nilを返す
-}
+// AddLine 注文明細を追加する
+// - 引数: OrderLine
+// - 戻り値: error
+//
+// 実装のポイント:
+// 1. ステータスがDraftかチェック
+//    - Draft以外ならエラーを返す
+//
+// 2. 重複チェック（重要な不変条件）
+//    - o.linesをループして、同じProductIDが存在しないかチェック
+//    - 既に存在すればエラーを返す
+//
+// 3. 合計金額の上限チェック
+//    - 新しい明細を追加した場合の合計金額を計算
+//    - Money型を使って上限（例: 100万円）と比較
+//    - 上限を超えていればエラーを返す
+//
+// 4. 明細を追加
+//    - o.linesにlineを追加
+//    - nilを返す
 ```
 
    **重要**: 不変条件は集約ルート（Order）のメソッド内で必ずチェックし、違反する操作は拒否してください。
@@ -554,6 +557,24 @@ infrastructure/
     stock_repository_test.go
 ```
 
+### OrderRepository実装のヒント
+```go
+// domain/order_repository.go
+package domain
+
+// OrderRepository 注文リポジトリのインターフェース
+// 必要なメソッド:
+// - Save: 注文を保存（集約全体を永続化）
+// - FindByID: 注文IDで取得
+// - FindByCustomerID: 顧客IDで注文一覧を取得
+// - Delete: 注文を削除
+//
+// ポイント:
+// - contextを第一引数に取る
+// - 戻り値でエラーを返す
+// - 集約全体（Order + OrderLines）を保存・取得する
+```
+
 ### StockRepository実装のヒント
 ```go
 // domain/stock_repository.go
@@ -579,6 +600,7 @@ package domain
   infrastructure/   ← リポジトリ実装
     persistence/
       order_repository_impl.go
+      order_record.go // DTO/DB
   ```
 - **実装はインフラストラクチャ層に置く**
 - テストではインメモリ実装を使用
