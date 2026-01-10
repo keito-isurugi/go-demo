@@ -18,10 +18,11 @@ const (
 const MaxOrderAmount = 1000000
 
 type Order struct {
-	id         OrderID
-	customerID CustomerID
-	lines      []OrderLine
-	status     OrderStatus
+	id           OrderID
+	customerID   CustomerID
+	lines        []OrderLine
+	status       OrderStatus
+	domainEvents []DomainEvent
 }
 
 func NewOrder(id OrderID, customerID CustomerID, lines []OrderLine, status OrderStatus) (Order, error) {
@@ -110,6 +111,15 @@ func (o *Order) Confirm() error {
 	}
 
 	o.status = Confirmed
+
+	// OrderConfirmedイベントを生成
+	total, err := o.Total()
+	if err != nil {
+		return err
+	}
+	event := NewOrderConfirmed(o.id, o.customerID, total)
+	o.domainEvents = append(o.domainEvents, event)
+
 	return nil
 }
 
@@ -118,6 +128,15 @@ func (o *Order) Pay() error {
 		return errors.New("can only pay confirmed orders")
 	}
 	o.status = Paid
+
+	// PaymentCompletedイベントを生成
+	total, err := o.Total()
+	if err != nil {
+		return err
+	}
+	event := NewPaymentCompleted(o.id, o.customerID, total)
+	o.domainEvents = append(o.domainEvents, event)
+
 	return nil
 }
 
@@ -178,4 +197,15 @@ func (o Order) Line() []OrderLine {
 
 func (o Order) Status() OrderStatus {
 	return o.status
+}
+
+// DomainEvents 保持しているドメインイベントを返す
+func (o Order) DomainEvents() []DomainEvent {
+	return o.domainEvents
+}
+
+// ClearDomainEvents ドメインイベントをクリアする
+// イベント発行後にアプリケーション層から呼ばれる
+func (o *Order) ClearDomainEvents() {
+	o.domainEvents = nil
 }
