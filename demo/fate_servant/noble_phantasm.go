@@ -147,3 +147,83 @@ func (i *IoniouHetairoi) Activate() int {
 	fmt.Println("固有結界展開！数万の英霊が呼応し戦場を駆ける！")
 	return 12000
 }
+
+// =============================================================================
+// アルトリアの追加宝具（Lancer, Rider用）
+// =============================================================================
+
+// Rhongomyniad はランサーアルトリアの宝具（最果てにて輝ける槍）
+type Rhongomyniad struct{}
+
+func (r *Rhongomyniad) GetName() string {
+	return "最果てにて輝ける槍（ロンゴミニアド）"
+}
+
+func (r *Rhongomyniad) GetChant() string {
+	return "この輝きは星の光、世界を繋ぐ錨なり。光よ、星よ！ロンゴミニアド！"
+}
+
+func (r *Rhongomyniad) Activate() int {
+	fmt.Println(r.GetChant())
+	fmt.Println("【" + r.GetName() + "】発動！")
+	fmt.Println("世界の果ての光が敵を貫く！")
+	return 9500
+}
+
+// Llamrei はライダーアルトリアの宝具（白銀の騎馬）
+type Llamrei struct{}
+
+func (l *Llamrei) GetName() string {
+	return "白銀の騎馬（ラムレイ）"
+}
+
+func (l *Llamrei) GetChant() string {
+	return "駆けよ、我が忠実なる騎馬よ！"
+}
+
+func (l *Llamrei) Activate() int {
+	fmt.Println(l.GetChant())
+	fmt.Println("【" + l.GetName() + "】発動！")
+	fmt.Println("白銀の騎馬が敵陣を駆け抜ける！")
+	return 6000
+}
+
+// =============================================================================
+// クー・フーリンの追加宝具（Caster, Berserker用）
+// =============================================================================
+
+// WickerMan はキャスタークー・フーリンの宝具（灼き尽くす炎の檻）
+type WickerMan struct{}
+
+func (w *WickerMan) GetName() string {
+	return "灼き尽くす炎の檻（ウィッカーマン）"
+}
+
+func (w *WickerMan) GetChant() string {
+	return "大神の炎で浄化してやる！燃え尽きろ！"
+}
+
+func (w *WickerMan) Activate() int {
+	fmt.Println(w.GetChant())
+	fmt.Println("【" + w.GetName() + "】発動！")
+	fmt.Println("巨大な藁人形が敵を焼き尽くす！")
+	return 7500
+}
+
+// GaeBolgBeast はバーサーカークー・フーリンの宝具（噛み砕く死牙の獣）
+type GaeBolgBeast struct{}
+
+func (g *GaeBolgBeast) GetName() string {
+	return "噛み砕く死牙の獣（クリード・コインヘン）"
+}
+
+func (g *GaeBolgBeast) GetChant() string {
+	return "グォォォォォ！！！"
+}
+
+func (g *GaeBolgBeast) Activate() int {
+	fmt.Println(g.GetChant())
+	fmt.Println("【" + g.GetName() + "】発動！")
+	fmt.Println("狂化した獣が敵を引き裂く！")
+	return 8500
+}

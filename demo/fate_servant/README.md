@@ -21,6 +21,70 @@ Fateシリーズのサーヴァントを題材に、Goのデザインパター�
 
 ---
 
+## 実装されたFateの設定
+
+### クラス適性システム
+
+英霊は固定のクラスを持つのではなく、生前の逸話に基づく**クラス適性**を持ちます。召喚時に適性のあるクラスのいずれかに確定します。
+
+```go
+// 英霊の定義
+type HeroicSpirit struct {
+    TrueName       string
+    ClassAptitudes []ServantClass                  // クラス適性
+    ClassConfigs   map[ServantClass]*ServantConfig // クラスごとの設定
+}
+
+// 召喚システム
+summonSystem := NewSummoningSystem()
+
+// アルトリアはSaber, Lancer, Riderの適性を持つ
+artoriaSaber, _ := summonSystem.Summon("アルトリア", ClassSaber)
+artoriaLancer, _ := summonSystem.Summon("アルトリア", ClassLancer)
+
+// 適性のないクラスへの召喚はエラー
+_, err := summonSystem.Summon("イスカンダル", ClassSaber) // エラー: Rider適性のみ
+```
+
+#### 登録されている英霊とクラス適性
+
+| 英霊 | クラス適性 | 備考 |
+|-----|-----------|------|
+| アルトリア・ペンドラゴン | Saber, Lancer, Rider | 剣（エクスカリバー）、槍（ロンゴミニアド）、騎乗 |
+| クー・フーリン | Lancer, Caster, Berserker | 槍の英雄、ドルイドの知識、狂戦士化 |
+| エミヤ | Archer, Assassin | 弓、暗殺 |
+| ギルガメッシュ | Archer, Caster | 宝物の射出、賢王としての側面 |
+| イスカンダル | Rider | 征服王の騎乗 |
+
+### クラスによる宝具・ステータスの変化
+
+同じ英霊でもクラスによって宝具とステータスが異なります。
+
+| 英霊 | クラス | 宝具 |
+|-----|-------|------|
+| アルトリア | Saber | エクスカリバー（約束された勝利の剣） |
+| アルトリア | Lancer | ロンゴミニアド（最果てにて輝ける槍） |
+| アルトリア | Rider | ラムレイ（白銀の騎馬） |
+| クー・フーリン | Lancer | ゲイ・ボルク（刺し穿つ死棘の槍） |
+| クー・フーリン | Caster | ウィッカーマン（灼き尽くす炎の檻） |
+| クー・フーリン | Berserker | クリード・コインヘン（噛み砕く死牙の獣） |
+
+### 聖杯戦争ルール
+
+聖杯戦争では同一クラスのサーヴァントは1騎のみ。既に枠が埋まっているクラスには召喚できません。
+
+```go
+holyGrailWar := NewSummoningSystem()
+
+// Saberの枠を埋める
+holyGrailWar.SummonForHolyGrailWar("アルトリア", ClassSaber) // 成功
+
+// 同じSaberの枠には召喚不可
+holyGrailWar.SummonForHolyGrailWar("エミヤ", ClassSaber) // エラー: 枠が埋まっている
+```
+
+---
+
 ## 実装されたデザインパターン
 
 ### 1. Strategy Pattern（戦略パターン）
@@ -43,41 +107,27 @@ type GaeBolg struct{}        // ゲイ・ボルク
 type UnlimitedBladeWorks struct{} // 無限の剣製
 ```
 
-| 宝具 | サーヴァント | 説明 |
-|-----|------------|------|
-| エクスカリバー | アルトリア | 約束された勝利の剣 |
-| ゲイ・ボルク | クー・フーリン | 刺し穿つ死棘の槍 |
-| 無限の剣製 | エミヤ | 固有結界 |
-| 王の財宝 | ギルガメッシュ | ゲート・オブ・バビロン |
-| エヌマ・エリシュ | ギルガメッシュ | 天地乖離す開闘の星 |
-| 王の軍勢 | イスカンダル | アイオニオン・ヘタイロイ |
-
 ---
 
 ### 2. Factory Pattern（ファクトリーパターン）
 
-**ファイル**: `servant.go`
+**ファイル**: `heroic_spirit.go`
 
-サーヴァントの生成を一元管理。名前またはクラスでサーヴァントを召喚できます。
+召喚システムとして実装。英霊の座（レジストリ）から英霊を取得し、指定クラスで召喚します。
 
 ```go
-factory := &ServantFactory{}
+// 召喚システム
+summonSystem := NewSummoningSystem()
 
-// 名前で召喚
-artoria := factory.CreateServant("アルトリア")
-gilgamesh := factory.CreateServant("ギルガメッシュ")
+// 英霊を指定クラスで召喚
+artoria, err := summonSystem.Summon("アルトリア", ClassSaber)
 
-// クラスで召喚
-saber := factory.CreateServantByClass(ClassSaber)
-lancer := factory.CreateServantByClass(ClassLancer)
+// 適性クラスからランダムに召喚
+servant, err := summonSystem.SummonRandom("クー・フーリン")
+
+// 聖杯戦争用召喚（同一クラス重複不可）
+servant, err := summonSystem.SummonForHolyGrailWar("ギルガメッシュ", ClassArcher)
 ```
-
-| クラス | デフォルトサーヴァント |
-|-------|---------------------|
-| Saber | アルトリア・ペンドラゴン |
-| Archer | エミヤ |
-| Lancer | クー・フーリン |
-| Rider | イスカンダル |
 
 ---
 
@@ -158,13 +208,24 @@ go run ./cmd/main.go
 
 ```mermaid
 classDiagram
+    class HeroicSpirit {
+        +TrueName string
+        +ClassAptitudes []ServantClass
+        +ClassConfigs map[ServantClass]*ServantConfig
+        +HasAptitude(class) bool
+    }
+
+    class SummoningSystem {
+        +Summon(name, class) Servant
+        +SummonRandom(name) Servant
+        +SummonForHolyGrailWar(name, class) Servant
+    }
+
     class Servant {
         <<interface>>
         +GetTrueName() string
         +GetClass() ServantClass
-        +GetStats() Stats
         +GetNoblePhantasm() NoblePhantasm
-        +Attack() int
         +UseNoblePhantasm() int
     }
 
@@ -175,12 +236,6 @@ classDiagram
         +Activate() int
     }
 
-    class ServantObserver {
-        <<interface>>
-        +OnCommand(cmd Command)
-        +GetServant() Servant
-    }
-
     class Master {
         +Name string
         +CommandSpells int
@@ -189,60 +244,43 @@ classDiagram
         +UseCommandSpell(cmd)
     }
 
-    class ServantFactory {
-        +CreateServant(name) Servant
-        +CreateServantByClass(class) Servant
-    }
-
-    class BattleTemplate {
-        +PerformAction() int
-    }
-
-    class BattleAction {
+    class ServantObserver {
         <<interface>>
-        +Prepare()
-        +Execute() int
-        +Finalize()
+        +OnCommand(cmd Command)
+        +GetServant() Servant
     }
 
+    HeroicSpirit --> SummoningSystem : registered in
+    SummoningSystem --> Servant : creates
     Servant --> NoblePhantasm : has
     Master --> ServantObserver : notifies
     ServantObserver --> Servant : wraps
-    ServantFactory --> Servant : creates
-    BattleTemplate --> BattleAction : uses
 ```
 
-## 各パターンの関係
+## 召喚フロー
 
 ```mermaid
 flowchart TB
-    subgraph "Factory Pattern"
-        F[ServantFactory]
-        F --> S1[Artoria]
-        F --> S2[Gilgamesh]
-        F --> S3[Emiya]
+    subgraph "英霊の座"
+        HS[HeroicSpirit]
+        HS --> |"適性: Saber, Lancer, Rider"| Artoria
+        HS --> |"適性: Lancer, Caster, Berserker"| CuChulainn
+        HS --> |"適性: Archer, Caster"| Gilgamesh
     end
 
-    subgraph "Strategy Pattern"
-        S1 --> NP1[Excalibur]
-        S2 --> NP2[Gate of Babylon]
-        S2 --> NP3[Enuma Elish]
-        S3 --> NP4[Unlimited Blade Works]
+    subgraph "召喚システム"
+        SS[SummoningSystem]
+        SS --> |"Summon(アルトリア, Saber)"| Check{適性チェック}
+        Check --> |"適性あり"| Create[サーヴァント生成]
+        Check --> |"適性なし"| Error[エラー]
+        Create --> Config[クラス設定適用]
+        Config --> |"宝具・ステータス"| Servant
     end
 
-    subgraph "Observer Pattern"
-        M[Master]
-        M -->|command| O1[LoyalServant]
-        M -->|command| O2[ProudServant]
-        O1 --> S1
-        O2 --> S2
-    end
-
-    subgraph "Template Method Pattern"
-        BT[BattleTemplate]
-        BT --> BA1[NormalAttack]
-        BT --> BA2[NoblePhantasm]
-        BT --> BA3[ComboAttack]
+    subgraph "召喚結果"
+        Servant[SummonedServant]
+        Servant --> |"Saber"| Excalibur
+        Servant --> |"Lancer"| Rhongomyniad
     end
 ```
 
@@ -252,8 +290,9 @@ flowchart TB
 demo/fate_servant/
 ├── go.mod              # モジュール定義
 ├── README.md           # このファイル
+├── heroic_spirit.go    # 英霊・召喚システム（クラス適性）
 ├── noble_phantasm.go   # Strategy Pattern - 宝具
-├── servant.go          # Factory Pattern - サーヴァント
+├── servant.go          # サーヴァント基本実装
 ├── battle.go           # Template Method Pattern - バトル
 ├── master.go           # Observer Pattern - マスター
 └── cmd/
