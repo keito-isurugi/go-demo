@@ -30,16 +30,25 @@ go run ./cmd/main.go
 
 出力:
 ```
-=== Fate/Design Pattern Demo ===
+=== Fate/Design Pattern デモ ===
 
--- Factory Pattern: Summoning --
-Artoria as Saber: NP=Excalibur
-Artoria as Lancer: NP=Rhongomyniad
-Iskandar as Saber: no aptitude for class: Iskandar -> Saber
+[Factory Pattern] 召喚システム
+英霊はクラス適性を持ち、適性のあるクラスでのみ召喚可能
+  アルトリアをSaberで召喚 → 宝具: Excalibur
+  アルトリアをLancerで召喚 → 宝具: Rhongomyniad
+  イスカンダルをSaberで召喚 → エラー: no aptitude for class
 
--- Strategy Pattern: Noble Phantasm --
-Artoria (Saber) uses Excalibur -> 9000 damage
-Artoria (Lancer) uses Rhongomyniad -> 9500 damage
+[Strategy Pattern] 宝具
+同じ英霊でもクラスによって宝具が異なる
+  Artoria (Saber): Excalibur → 9000ダメージ
+  Artoria (Lancer): Rhongomyniad → 9500ダメージ
+
+[Observer Pattern] マスターとサーヴァント
+マスターの命令が契約サーヴァント全員に通知される
+  マスター: 衛宮士郎（令呪: 3画）
+  令呪を使用して宝具解放を命令:
+    Artoria: Excalibur → 9000ダメージ
+  残り令呪: 2画
 ```
 
 ## コード例
@@ -50,10 +59,10 @@ Artoria (Lancer) uses Rhongomyniad -> 9500 damage
 summoner := fate.NewSummoner()
 
 // クラス適性に基づく召喚
-saber, _ := summoner.Summon("Artoria", fate.ClassSaber)
-lancer, _ := summoner.Summon("Artoria", fate.ClassLancer)
+saber, _ := summoner.Summon("Artoria", fate.ClassSaber)   // OK
+lancer, _ := summoner.Summon("Artoria", fate.ClassLancer) // OK
 
-// 適性なし -> エラー
+// 適性なし → エラー
 _, err := summoner.Summon("Iskandar", fate.ClassSaber)
 ```
 
@@ -70,14 +79,31 @@ saber.NoblePhantasm().Name()  // "Excalibur"
 lancer.NoblePhantasm().Name() // "Rhongomyniad"
 ```
 
+### Template Method Pattern: バトル
+
+```go
+type BattleAction interface {
+    Prepare()
+    Execute() int
+    Cleanup()
+}
+
+// テンプレートが共通の流れを定義
+template := fate.NewBattleTemplate(action)
+damage := template.Run() // Prepare → Execute → Cleanup
+```
+
 ### Observer Pattern: マスター
 
 ```go
-master := fate.NewMaster("Shirou")
+master := fate.NewMaster("衛宮士郎")
 master.Contract(fate.NewContractedServant(saber))
 
-// 命令発行 -> 全サーヴァントに通知
+// 命令発行 → 全サーヴァントに通知
 master.Command(fate.Command{Type: fate.CommandAttack})
+
+// 令呪使用
+master.UseCommandSpell(fate.Command{Type: fate.CommandUseNoblePhantasm})
 ```
 
 ## ファイル構成
