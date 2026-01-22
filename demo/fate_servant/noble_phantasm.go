@@ -1,229 +1,56 @@
 // Package fate_servant demonstrates design patterns using Fate series Servants
 package fate_servant
 
-import "fmt"
-
-// =============================================================================
-// Strategy Pattern: 宝具（Noble Phantasm）の実装
-// 各サーヴァントが異なる宝具を持ち、攻撃方法を動的に切り替え可能
-// =============================================================================
-
-// NoblePhantasm は宝具のインターフェース（Strategy）
+// NoblePhantasm は宝具のインターフェース（Strategy Pattern）
 type NoblePhantasm interface {
-	GetName() string
-	GetChant() string
-	Activate() int // ダメージを返す
+	Name() string
+	Damage() int
 }
 
-// Excalibur はセイバーの宝具（約束された勝利の剣）
+// Excalibur - アルトリア(Saber)の宝具
 type Excalibur struct{}
 
-func (e *Excalibur) GetName() string {
-	return "約束された勝利の剣（エクスカリバー）"
-}
+func (e *Excalibur) Name() string  { return "Excalibur" }
+func (e *Excalibur) Damage() int   { return 9000 }
 
-func (e *Excalibur) GetChant() string {
-	return "誓いの言葉を紡ごう、世界を救う光となれ！エクスカリバー！"
-}
-
-func (e *Excalibur) Activate() int {
-	fmt.Println(e.GetChant())
-	fmt.Println("【" + e.GetName() + "】発動！")
-	fmt.Println("黄金の光が敵を包み込む！")
-	return 9000 // 高ダメージ
-}
-
-// GaeBolg はランサーの宝具（刺し穿つ死棘の槍）
-type GaeBolg struct{}
-
-func (g *GaeBolg) GetName() string {
-	return "刺し穿つ死棘の槍（ゲイ・ボルク）"
-}
-
-func (g *GaeBolg) GetChant() string {
-	return "その心臓、貰い受ける！"
-}
-
-func (g *GaeBolg) Activate() int {
-	fmt.Println(g.GetChant())
-	fmt.Println("【" + g.GetName() + "】発動！")
-	fmt.Println("因果逆転の呪いが心臓を貫く！")
-	return 7000 // 必中効果付き
-}
-
-// UnlimitedBladeWorks はアーチャーの宝具（無限の剣製）
-type UnlimitedBladeWorks struct{}
-
-func (u *UnlimitedBladeWorks) GetName() string {
-	return "無限の剣製（アンリミテッドブレイドワークス）"
-}
-
-func (u *UnlimitedBladeWorks) GetChant() string {
-	return `体は剣で出来ている
-血潮は鉄で 心は硝子
-幾たびの戦場を越えて不敗
-ただの一度も敗走はなく
-ただの一度も理解されない
-彼の者は常に独り 剣の丘で勝利に酔う
-故に、生涯に意味はなく
-その体は、きっと剣で出来ていた`
-}
-
-func (u *UnlimitedBladeWorks) Activate() int {
-	fmt.Println(u.GetChant())
-	fmt.Println("【" + u.GetName() + "】発動！")
-	fmt.Println("固有結界展開！無数の剣が降り注ぐ！")
-	return 8000
-}
-
-// GateOfBabylon はギルガメッシュの宝具（王の財宝）
-type GateOfBabylon struct{}
-
-func (g *GateOfBabylon) GetName() string {
-	return "王の財宝（ゲート・オブ・バビロン）"
-}
-
-func (g *GateOfBabylon) GetChant() string {
-	return "雑種が...慢心せずに全力で叩き潰してやろう"
-}
-
-func (g *GateOfBabylon) Activate() int {
-	fmt.Println(g.GetChant())
-	fmt.Println("【" + g.GetName() + "】発動！")
-	fmt.Println("無数の宝具が空間から射出される！")
-	return 10000 // 最強クラス
-}
-
-// EnumaElish はギルガメッシュの最強宝具（天地乖離す開闘の星）
-type EnumaElish struct{}
-
-func (e *EnumaElish) GetName() string {
-	return "天地乖離す開闘の星（エヌマ・エリシュ）"
-}
-
-func (e *EnumaElish) GetChant() string {
-	return "目を開けろ、全てを見据え、ただ前を向け。世界を切り裂く！エヌマ・エリシュ！"
-}
-
-func (e *EnumaElish) Activate() int {
-	fmt.Println(e.GetChant())
-	fmt.Println("【" + e.GetName() + "】発動！")
-	fmt.Println("乖離剣エアが世界を切り裂く！")
-	return 15000 // 対界宝具
-}
-
-// Gordius はライダーの宝具（神威の車輪）
-type Gordius struct{}
-
-func (g *Gordius) GetName() string {
-	return "神威の車輪（ゴルディアス・ホイール）"
-}
-
-func (g *Gordius) GetChant() string {
-	return "蹂躙せよ！神威の車輪！"
-}
-
-func (g *Gordius) Activate() int {
-	fmt.Println(g.GetChant())
-	fmt.Println("【" + g.GetName() + "】発動！")
-	fmt.Println("神牛が引く戦車が敵陣を蹂躙する！")
-	return 6500
-}
-
-// IoniouHetairoi はイスカンダルの宝具（王の軍勢）
-type IoniouHetairoi struct{}
-
-func (i *IoniouHetairoi) GetName() string {
-	return "王の軍勢（アイオニオン・ヘタイロイ）"
-}
-
-func (i *IoniouHetairoi) GetChant() string {
-	return "我が覇道に、集え英雄！"
-}
-
-func (i *IoniouHetairoi) Activate() int {
-	fmt.Println(i.GetChant())
-	fmt.Println("【" + i.GetName() + "】発動！")
-	fmt.Println("固有結界展開！数万の英霊が呼応し戦場を駆ける！")
-	return 12000
-}
-
-// =============================================================================
-// アルトリアの追加宝具（Lancer, Rider用）
-// =============================================================================
-
-// Rhongomyniad はランサーアルトリアの宝具（最果てにて輝ける槍）
+// Rhongomyniad - アルトリア(Lancer)の宝具
 type Rhongomyniad struct{}
 
-func (r *Rhongomyniad) GetName() string {
-	return "最果てにて輝ける槍（ロンゴミニアド）"
-}
+func (r *Rhongomyniad) Name() string  { return "Rhongomyniad" }
+func (r *Rhongomyniad) Damage() int   { return 9500 }
 
-func (r *Rhongomyniad) GetChant() string {
-	return "この輝きは星の光、世界を繋ぐ錨なり。光よ、星よ！ロンゴミニアド！"
-}
+// GaeBolg - クー・フーリン(Lancer)の宝具
+type GaeBolg struct{}
 
-func (r *Rhongomyniad) Activate() int {
-	fmt.Println(r.GetChant())
-	fmt.Println("【" + r.GetName() + "】発動！")
-	fmt.Println("世界の果ての光が敵を貫く！")
-	return 9500
-}
+func (g *GaeBolg) Name() string  { return "Gae Bolg" }
+func (g *GaeBolg) Damage() int   { return 7000 }
 
-// Llamrei はライダーアルトリアの宝具（白銀の騎馬）
-type Llamrei struct{}
-
-func (l *Llamrei) GetName() string {
-	return "白銀の騎馬（ラムレイ）"
-}
-
-func (l *Llamrei) GetChant() string {
-	return "駆けよ、我が忠実なる騎馬よ！"
-}
-
-func (l *Llamrei) Activate() int {
-	fmt.Println(l.GetChant())
-	fmt.Println("【" + l.GetName() + "】発動！")
-	fmt.Println("白銀の騎馬が敵陣を駆け抜ける！")
-	return 6000
-}
-
-// =============================================================================
-// クー・フーリンの追加宝具（Caster, Berserker用）
-// =============================================================================
-
-// WickerMan はキャスタークー・フーリンの宝具（灼き尽くす炎の檻）
+// WickerMan - クー・フーリン(Caster)の宝具
 type WickerMan struct{}
 
-func (w *WickerMan) GetName() string {
-	return "灼き尽くす炎の檻（ウィッカーマン）"
-}
+func (w *WickerMan) Name() string  { return "Wicker Man" }
+func (w *WickerMan) Damage() int   { return 7500 }
 
-func (w *WickerMan) GetChant() string {
-	return "大神の炎で浄化してやる！燃え尽きろ！"
-}
+// UnlimitedBladeWorks - エミヤ(Archer)の宝具
+type UnlimitedBladeWorks struct{}
 
-func (w *WickerMan) Activate() int {
-	fmt.Println(w.GetChant())
-	fmt.Println("【" + w.GetName() + "】発動！")
-	fmt.Println("巨大な藁人形が敵を焼き尽くす！")
-	return 7500
-}
+func (u *UnlimitedBladeWorks) Name() string  { return "Unlimited Blade Works" }
+func (u *UnlimitedBladeWorks) Damage() int   { return 8000 }
 
-// GaeBolgBeast はバーサーカークー・フーリンの宝具（噛み砕く死牙の獣）
-type GaeBolgBeast struct{}
+// GateOfBabylon - ギルガメッシュ(Archer)の宝具
+type GateOfBabylon struct{}
 
-func (g *GaeBolgBeast) GetName() string {
-	return "噛み砕く死牙の獣（クリード・コインヘン）"
-}
+func (g *GateOfBabylon) Name() string  { return "Gate of Babylon" }
+func (g *GateOfBabylon) Damage() int   { return 10000 }
 
-func (g *GaeBolgBeast) GetChant() string {
-	return "グォォォォォ！！！"
-}
+// EnumaElish - ギルガメッシュの最強宝具
+type EnumaElish struct{}
 
-func (g *GaeBolgBeast) Activate() int {
-	fmt.Println(g.GetChant())
-	fmt.Println("【" + g.GetName() + "】発動！")
-	fmt.Println("狂化した獣が敵を引き裂く！")
-	return 8500
-}
+func (e *EnumaElish) Name() string  { return "Enuma Elish" }
+func (e *EnumaElish) Damage() int   { return 15000 }
+
+// IoniouHetairoi - イスカンダル(Rider)の宝具
+type IoniouHetairoi struct{}
+
+func (i *IoniouHetairoi) Name() string  { return "Ionioi Hetairoi" }
+func (i *IoniouHetairoi) Damage() int   { return 12000 }
